@@ -18,6 +18,7 @@ const menuItemSchema = new mongoose.Schema(
     },
     available: { type: Boolean, default: true },
     popular: { type: Boolean, default: false },
+    newArrival: { type: Boolean, default: false },
     vegetarian: { type: Boolean, default: false },
   },
   { timestamps: true }
