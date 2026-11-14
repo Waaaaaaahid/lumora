@@ -31,6 +31,7 @@ export interface MenuItem {
   image: string;
   available: boolean;
   popular: boolean;
+  newArrival?: boolean;
   vegetarian: boolean;
   sku?: string | undefined;
   brand?: string | undefined;
