@@ -21,6 +21,7 @@ export interface MenuItemFormValues {
   image: string;
   available: boolean;
   popular: boolean;
+  newArrival: boolean;
   vegetarian: boolean;
 }
 
@@ -37,6 +38,7 @@ export const emptyMenuItemForm: MenuItemFormValues = {
   image: "",
   available: true,
   popular: false,
+  newArrival: false,
   vegetarian: false,
 };
 
@@ -54,6 +56,7 @@ export function menuItemToForm(item: MenuItem): MenuItemFormValues {
     image: item.image,
     available: item.available,
     popular: item.popular,
+    newArrival: item.newArrival ?? false,
     vegetarian: item.vegetarian,
   };
 }
@@ -185,6 +188,7 @@ export function MenuItemForm({
       <div className="grid gap-3 sm:grid-cols-2">
         <SwitchRow label="Available" checked={values.available} onChange={(value) => set("available", value)} />
         <SwitchRow label="Feature on homepage" checked={values.popular} onChange={(value) => set("popular", value)} />
+        <SwitchRow label="Show in New Arrivals" checked={values.newArrival} onChange={(value) => set("newArrival", value)} />
         
       </div>
 
