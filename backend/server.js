@@ -23,6 +23,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const cafeRoutes = require('./routes/cafeRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const couponRoutes = require('./routes/couponRoutes');
+const portfolioRoutes = require('./routes/portfolioRoutes');
 
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
@@ -79,6 +80,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/cafe', cafeRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/portfolio', portfolioRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
