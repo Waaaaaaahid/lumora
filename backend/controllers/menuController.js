@@ -34,6 +34,7 @@ const getMenuItems = asyncHandler(async (req, res) => {
   }
   if (req.query.available) filters.available = req.query.available === 'true';
   if (req.query.popular) filters.popular = req.query.popular === 'true';
+  if (req.query.newArrival === 'true') filters.newArrival = true;
   if (req.query.search) filters.name = { $regex: req.query.search, $options: 'i' };
 
   const menuItems = await MenuItem.find(filters).populate({ path: 'category', match: { active: true } });
