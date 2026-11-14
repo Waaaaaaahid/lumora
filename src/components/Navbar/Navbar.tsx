@@ -3,7 +3,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, LogOut, Menu as MenuIcon, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useCafe } from "@/context/CafeContext";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/AppButton";
 import { AnnouncementBar } from "@/components/AnnouncementBar/AnnouncementBar";
@@ -12,7 +11,6 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { count, openCart } = useCart();
-  const { user } = useCafe();
   const { user: authUser, isAdmin, logout } = useAuth();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
