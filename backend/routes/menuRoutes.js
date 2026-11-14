@@ -62,7 +62,7 @@ router.post('/upload', protect, admin, upload.single('image'), (req, res) => {
     });
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
     return res.status(503).json({
       success: false,
       message:
