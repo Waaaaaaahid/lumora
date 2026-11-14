@@ -27,10 +27,24 @@ const DEMO_PROJECT = {
 };
 
 async function ensurePortfolioDemoSeeded() {
+  const migrations = PortfolioProject.db.collection('appmigrations');
+  const migrationKey = 'portfolio-demo-project-v1';
+  const claim = await migrations.updateOne(
+    { _id: migrationKey },
+    { $setOnInsert: { startedAt: new Date() } },
+    { upsert: true },
+  );
+  if (!claim.upsertedCount) return { seeded: false, alreadyChecked: true };
+
+  // Never overwrite a real project if the owner has already added one.
   const existing = await PortfolioProject.exists({});
-  if (existing) return { seeded: false };
+  if (existing) {
+    await migrations.updateOne({ _id: migrationKey }, { $set: { completedAt: new Date(), skipped: true } });
+    return { seeded: false, existingProjects: true };
+  }
 
   await PortfolioProject.create(DEMO_PROJECT);
+  await migrations.updateOne({ _id: migrationKey }, { $set: { completedAt: new Date(), seeded: true } });
   console.log('Seeded the editable Warm Minimal Kitchen portfolio demo.');
   return { seeded: true };
 }
