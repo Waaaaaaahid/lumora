@@ -18,6 +18,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MenuRouteImport } from './routes/menu'
+import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
 import { Route as OrderSuccessRouteImport } from './routes/order-success'
 import { Route as OrderTrackingRouteImport } from './routes/order-tracking'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -78,6 +79,11 @@ const LoginRoute = LoginRouteImport.update({
 const MenuRoute = MenuRouteImport.update({
   id: '/menu',
   path: '/menu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewArrivalsRoute = NewArrivalsRouteImport.update({
+  id: '/new-arrivals',
+  path: '/new-arrivals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderSuccessRoute = OrderSuccessRouteImport.update({
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
+  '/new-arrivals': typeof NewArrivalsRoute
   '/order-success': typeof OrderSuccessRoute
   '/order-tracking': typeof OrderTrackingRoute
   '/profile': typeof ProfileRoute
@@ -251,6 +258,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/menu'
+    | '/new-arrivals'
     | '/order-success'
     | '/order-tracking'
     | '/profile'
@@ -328,6 +336,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   MenuRoute: typeof MenuRoute
+  NewArrivalsRoute: typeof NewArrivalsRoute
   OrderSuccessRoute: typeof OrderSuccessRoute
   OrderTrackingRoute: typeof OrderTrackingRoute
   ProfileRoute: typeof ProfileRoute
@@ -405,6 +414,13 @@ declare module '@tanstack/react-router' {
       path: '/menu'
       fullPath: '/menu'
       preLoaderRoute: typeof MenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/new-arrivals': {
+      id: '/new-arrivals'
+      path: '/new-arrivals'
+      fullPath: '/new-arrivals'
+      preLoaderRoute: typeof NewArrivalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/order-success': {
@@ -564,6 +580,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   MenuRoute: MenuRoute,
+  NewArrivalsRoute: NewArrivalsRoute,
   OrderSuccessRoute: OrderSuccessRoute,
   OrderTrackingRoute: OrderTrackingRoute,
   ProfileRoute: ProfileRoute,
