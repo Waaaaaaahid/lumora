@@ -3,6 +3,11 @@ const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/response');
 const { deleteCloudinaryImage } = require('../services/uploadService');
 
+const uploadImage = asyncHandler(async (req, res) => {
+  if (!req.file?.path) return error(res, 400, 'Please choose an image to upload');
+  return success(res, 200, { url: req.file.path, publicId: req.file.filename }, 'Portfolio image uploaded');
+});
+
 const listProjects = asyncHandler(async (_req, res) => {
   const projects = await PortfolioProject.find({ published: true }).sort({ sortOrder: 1, createdAt: -1 });
   return success(res, 200, projects);
@@ -52,4 +57,4 @@ const deleteProject = asyncHandler(async (req, res) => {
   return success(res, 200, { _id: req.params.id }, 'Portfolio project deleted');
 });
 
-module.exports = { listProjects, listAdminProjects, createProject, updateProject, deleteProject };
+module.exports = { uploadImage, listProjects, listAdminProjects, createProject, updateProject, deleteProject };
