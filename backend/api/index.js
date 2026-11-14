@@ -3,9 +3,11 @@
 const app = require('../server');
 const connectDB = require('../config/db');
 const ensureMenuSeeded = require('../scripts/ensureMenuSeeded');
+const ensurePortfolioDemoSeeded = require('../scripts/ensurePortfolioDemoSeeded');
 
 let dbReady = null;
 let menuReady = null;
+let portfolioReady = null;
 
 module.exports = async (req, res) => {
   try {
@@ -27,6 +29,14 @@ module.exports = async (req, res) => {
       });
     }
     await menuReady;
+
+    if (!portfolioReady) {
+      portfolioReady = ensurePortfolioDemoSeeded().catch((error) => {
+        portfolioReady = null;
+        throw error;
+      });
+    }
+    await portfolioReady;
 
     return app(req, res);
   } catch (error) {
