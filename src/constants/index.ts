@@ -7,12 +7,14 @@ export const NAV_LINKS = [
   { label: "Menu", to: "/menu" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
+  { label: "Our Work", to: "/our-work" },
 ] as const;
 
 export const ADMIN_LINKS = [
   { label: "Dashboard", to: "/admin" },
   { label: "Products", to: "/admin/menu" },
   { label: "Categories", to: "/admin/categories" },
+  { label: "Our Work", to: "/admin/our-work" },
   { label: "Orders", to: "/admin/orders" },
   { label: "Coupons", to: "/admin/coupons" },
   { label: "Reviews", to: "/admin/reviews" },
