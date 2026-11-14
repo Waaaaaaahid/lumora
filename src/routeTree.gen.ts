@@ -165,7 +165,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/our-work': typeof OurWorkRoute
-  '/our-work': typeof OurWorkRoute
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -184,7 +183,6 @@ export interface FileRoutesByFullPath {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
-  '/admin/our-work': typeof AdminOurWorkRoute
   '/admin/our-work': typeof AdminOurWorkRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/menu/$id': typeof AdminMenuIdRoute
