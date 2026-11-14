@@ -28,6 +28,7 @@ const createProject = asyncHandler(async (req, res) => {
 const updateProject = asyncHandler(async (req, res) => {
   const project = await PortfolioProject.findById(req.params.id);
   if (!project) return error(res, 404, 'Portfolio project not found');
+  const previousImages = project.images.map((image) => ({ publicId: image.publicId, url: image.url }));
   const allowed = ['title', 'category', 'description', 'location', 'images', 'featured', 'published', 'sortOrder'];
   for (const key of allowed) if (key in req.body) project[key] = req.body[key];
   if (!project.title?.trim() || !project.category?.trim() || !project.description?.trim()) {
@@ -37,6 +38,9 @@ const updateProject = asyncHandler(async (req, res) => {
     return error(res, 400, 'At least one project image is required');
   }
   await project.save();
+  const retainedIds = new Set(project.images.map((image) => image.publicId).filter(Boolean));
+  const removedImages = previousImages.filter((image) => image.publicId && !retainedIds.has(image.publicId));
+  await Promise.all(removedImages.map((image) => deleteCloudinaryImage(image.publicId)));
   return success(res, 200, project, 'Portfolio project updated');
 });
 
