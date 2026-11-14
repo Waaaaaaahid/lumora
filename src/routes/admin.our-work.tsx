@@ -34,7 +34,7 @@ function AdminOurWorkPage() {
     setUploading(true);
     try {
       const uploaded = await Promise.all(valid.map(async (file) => {
-        const result = await adminService.uploadImage(file);
+        const result = await adminService.uploadPortfolioImage(file);
         return { url: result.url, publicId: result.publicId, alt: file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ") };
       }));
       setForm((current) => ({ ...current, images: [...current.images, ...uploaded] }));
