@@ -32,6 +32,8 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminMenuIdRouteImport } from './routes/admin.menu.$id'
 import { Route as AdminMenuNewRouteImport } from './routes/admin.menu.new'
+import { Route as OurWorkRouteImport } from './routes/our-work'
+import { Route as AdminOurWorkRouteImport } from './routes/admin.our-work'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -148,10 +150,22 @@ const AdminMenuNewRoute = AdminMenuNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AdminMenuRoute,
 } as any)
+const OurWorkRoute = OurWorkRouteImport.update({
+  id: '/our-work',
+  path: '/our-work',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminOurWorkRoute = AdminOurWorkRouteImport.update({
+  id: '/our-work',
+  path: '/our-work',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/our-work': typeof OurWorkRoute
+  '/our-work': typeof OurWorkRoute
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -170,6 +184,8 @@ export interface FileRoutesByFullPath {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/our-work': typeof AdminOurWorkRoute
+  '/admin/our-work': typeof AdminOurWorkRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/menu/$id': typeof AdminMenuIdRoute
   '/admin/menu/new': typeof AdminMenuNewRoute
@@ -229,6 +245,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/our-work'
     | '/admin'
     | '/cart'
     | '/checkout'
@@ -247,6 +264,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/our-work'
     | '/admin/'
     | '/admin/menu/$id'
     | '/admin/menu/new'
@@ -304,6 +322,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  OurWorkRoute: typeof OurWorkRoute
   AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -332,6 +351,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/our-work': {
+      id: '/our-work'
+      path: '/our-work'
+      fullPath: '/our-work'
+      preLoaderRoute: typeof OurWorkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -467,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/our-work': {
+      id: '/admin/our-work'
+      path: '/our-work'
+      fullPath: '/admin/our-work'
+      preLoaderRoute: typeof AdminOurWorkRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/menu/$id': {
       id: '/admin/menu/$id'
       path: '/$id'
@@ -505,6 +538,7 @@ interface AdminRouteChildren {
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminOurWorkRoute: typeof AdminOurWorkRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -515,6 +549,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminOurWorkRoute: AdminOurWorkRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -523,6 +558,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  OurWorkRoute: OurWorkRoute,
   AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
