@@ -38,8 +38,14 @@ function ForgotPasswordPage() {
       await authService.forgotPassword(email);
       setSent(true);
       notify("Reset link sent", { description: `Check ${email}`, variant: "success" });
-    } catch {
-      notify("Could not send the reset link", { variant: "error" });
+    } catch (requestError) {
+      notify("Could not send the reset link", {
+        description:
+          requestError instanceof Error
+            ? requestError.message
+            : "Please check your connection and try again.",
+        variant: "error",
+      });
     } finally {
       setLoading(false);
     }
