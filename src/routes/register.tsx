@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/AppButton";
-import { Field, TextInput } from "@/components/ui/Field";
+import { Field, PasswordInput, TextInput } from "@/components/ui/Field";
 import { AuthLayout } from "@/routes/login";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -110,7 +110,7 @@ function RegisterPage() {
           />
         </Field>
         <Field id="register-password" label="Password" error={errors.password}>
-          <TextInput
+          <PasswordInput
             id="register-password"
             type="password"
             value={form.password}
@@ -122,7 +122,7 @@ function RegisterPage() {
           />
         </Field>
         <Field id="register-confirm" label="Confirm password" error={errors.confirmPassword}>
-          <TextInput
+          <PasswordInput
             id="register-confirm"
             type="password"
             value={form.confirmPassword}
