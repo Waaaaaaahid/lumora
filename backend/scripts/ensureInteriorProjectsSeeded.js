@@ -1,5 +1,5 @@
-// Seed four additional interior portfolio projects once.
-// Existing projects are left untouched; admins can edit or remove these from Admin > Our Work.
+// Ensure the four interior portfolio projects exist in MongoDB.
+// Safe to run on every backend startup: existing admin edits are never overwritten.
 const PortfolioProject = require('../models/PortfolioProject');
 
 const PROJECTS = [
@@ -50,27 +50,24 @@ const PROJECTS = [
 ];
 
 async function ensureInteriorProjectsSeeded() {
-  const migrations = PortfolioProject.db.collection('appmigrations');
-  const migrationKey = 'lumora-four-interior-projects-v1';
-  const claim = await migrations.updateOne(
-    { _id: migrationKey },
-    { $setOnInsert: { startedAt: new Date() } },
-    { upsert: true },
-  );
-  if (!claim.upsertedCount) return { seeded: false, alreadyChecked: true };
+  let inserted = 0;
 
-  const existingTitles = new Set((await PortfolioProject.find(
-    { title: { $in: PROJECTS.map((project) => project.title) } },
-    { title: 1 },
-  )).map((project) => project.title));
-  const missing = PROJECTS.filter((project) => !existingTitles.has(project.title));
-  if (missing.length) await PortfolioProject.insertMany(missing);
-  await migrations.updateOne(
-    { _id: migrationKey },
-    { $set: { completedAt: new Date(), seededCount: missing.length } },
-  );
-  console.log(`Seeded ${missing.length} additional Lumora interior portfolio projects.`);
-  return { seeded: missing.length > 0, count: missing.length };
+  for (const project of PROJECTS) {
+    // Match by title so repeated restarts cannot create duplicate records.
+    // $setOnInsert preserves any edits already made by the admin dashboard.
+    const result = await PortfolioProject.updateOne(
+      { title: project.title },
+      { $setOnInsert: project },
+      { upsert: true, runValidators: true },
+    );
+    if (result.upsertedCount) inserted += 1;
+  }
+
+  const total = await PortfolioProject.countDocuments({
+    title: { $in: PROJECTS.map((project) => project.title) },
+  });
+  console.log(`Our Work backend seed check complete: ${total}/${PROJECTS.length} projects exist; inserted ${inserted} new projects.`);
+  return { inserted, total };
 }
 
 module.exports = ensureInteriorProjectsSeeded;
