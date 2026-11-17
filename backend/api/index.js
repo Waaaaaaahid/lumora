@@ -4,10 +4,12 @@ const app = require('../server');
 const connectDB = require('../config/db');
 const ensureMenuSeeded = require('../scripts/ensureMenuSeeded');
 const ensurePortfolioDemoSeeded = require('../scripts/ensurePortfolioDemoSeeded');
+const ensureInteriorProjectsSeeded = require('../scripts/ensureInteriorProjectsSeeded');
 
 let dbReady = null;
 let menuReady = null;
 let portfolioReady = null;
+let interiorPortfolioReady = null;
 
 module.exports = async (req, res) => {
   try {
@@ -20,8 +22,7 @@ module.exports = async (req, res) => {
     }
     await dbReady;
 
-    // This is a cheap migration-marker check after the first successful seed.
-    // The seeder skips all product/category upserts once the migration is done.
+    // Seed menu data once per warm serverless instance.
     if (!menuReady) {
       menuReady = ensureMenuSeeded().catch((error) => {
         menuReady = null;
@@ -37,6 +38,16 @@ module.exports = async (req, res) => {
       });
     }
     await portfolioReady;
+
+    // Ensure the four interior projects exist in the same MongoDB collection
+    // used by both the public Our Work page and the admin dashboard.
+    if (!interiorPortfolioReady) {
+      interiorPortfolioReady = ensureInteriorProjectsSeeded().catch((error) => {
+        interiorPortfolioReady = null;
+        throw error;
+      });
+    }
+    await interiorPortfolioReady;
 
     return app(req, res);
   } catch (error) {
