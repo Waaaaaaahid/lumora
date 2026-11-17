@@ -3,7 +3,7 @@ import { LayoutGroup, motion } from "framer-motion";
 import { useState, type FormEvent } from "react";
 import { ArrowUpRight, Leaf, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/AppButton";
-import { Field, TextInput } from "@/components/ui/Field";
+import { Field, PasswordInput, TextInput } from "@/components/ui/Field";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { validateLogin, type FieldErrors, type LoginForm } from "@/utils/validators";
@@ -76,7 +76,7 @@ function LoginPage() {
           />
         </Field>
         <Field id="login-password" label="Password" error={errors.password}>
-          <TextInput
+          <PasswordInput
             id="login-password"
             type="password"
             autoComplete="current-password"
