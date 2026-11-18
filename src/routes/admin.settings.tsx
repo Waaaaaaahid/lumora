@@ -93,7 +93,11 @@ function StoreSettingsPage() {
     event.preventDefault();
     setSaving(true);
     try {
-      await adminService.updateSettings(form);
+      // Use the server's saved response immediately so the storefront popup
+      // reflects the ordering without waiting for a stale settings query.
+      const savedSettings = await adminService.updateSettings(form);
+      setForm((current) => ({ ...current, ...savedSettings }));
+      queryClient.setQueryData(["cafe-settings"], savedSettings);
       dirtyRef.current = false;
       await queryClient.invalidateQueries({ queryKey: ["cafe-settings"] });
       notify("Store settings updated", { variant: "success" });
