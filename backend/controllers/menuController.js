@@ -7,7 +7,7 @@ const Review = require('../models/Review');
 const { deleteCloudinaryImage } = require('../services/uploadService');
 const { success, error } = require('../utils/response');
 
-const toClientItem = (item, rating = 0) => ({ ...item.toObject(), category: item.category?.slug ?? '', image: item.image?.url ?? '', rating });
+const toClientItem = (item, rating = 0) => ({ ...item.toObject(), category: item.category?.slug ?? '', image: item.image?.url ?? '', gallery: item.gallery ?? [], videoUrl: item.videoUrl ?? '', rating });
 const resolveCategoryId = async (slug) => { if (!slug) return null; const category = await Category.findOne({ slug, active: true }); return category ? category._id : null; };
 const normalizeImage = (image) => { if (!image) return undefined; if (typeof image === 'string') return { url: image }; return image; };
 
