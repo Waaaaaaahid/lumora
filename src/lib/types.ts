@@ -153,6 +153,8 @@ export interface CafeSettings {
   whatsappNumber: string;
   whatsappSalesNumber: string;
   whatsappSupportNumber: string;
+  salesNumberOrder?: "number1First" | "number2First";
+  supportNumberOrder?: "number1First" | "number2First";
 }
 
 export interface AuthSession {
