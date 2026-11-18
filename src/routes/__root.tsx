@@ -85,6 +85,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function WhatsAppEnquiry() {
+  const { settings } = useCafe();
   const [open, setOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<"sales" | "support" | null>(null);
 
@@ -112,9 +113,13 @@ function WhatsAppEnquiry() {
   }, [open]);
 
   const contacts = [
-    { label: "Executive 01", number: "919560277215" },
-    { label: "Executive 02", number: "919917932247" },
+    { label: "Number 1", number: settings.whatsappSalesNumber || "919560277215" },
+    { label: "Number 2", number: settings.whatsappSupportNumber || "919917932247" },
   ];
+  const orderedContacts = (section: "sales" | "support") => {
+    const order = section === "sales" ? settings.salesNumberOrder : settings.supportNumberOrder;
+    return order === "number2First" ? [...contacts].reverse() : contacts;
+  };
 
   const openChat = (number: string, category: "sales" | "support") => {
     const message = category === "sales"
@@ -160,7 +165,7 @@ function WhatsAppEnquiry() {
                         transition={{ duration: 0.18, ease: "easeOut" }}
                         className="absolute bottom-[calc(100%+9px)] left-0 z-20 flex min-w-[205px] flex-col gap-1.5 rounded-2xl border border-[#e7eee8] bg-white p-2 shadow-[0_8px_28px_rgba(0,0,0,.17)] sm:min-w-[230px] sm:p-2.5"
                       >
-                        {contacts.map((contact, contactIndex) => (
+                        {orderedContacts(id).map((contact, contactIndex) => (
                           <motion.button
                             key={contact.number}
                             type="button"
