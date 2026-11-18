@@ -1,5 +1,6 @@
 // backend/controllers/authController.js
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/response');
 const User = require('../models/User');
@@ -8,13 +9,14 @@ const { sendEmail, isEmailConfigured } = require('../services/emailService');
 
 const register = asyncHandler(async (req, res) => {
   const { name, email, phone, password } = req.body;
-  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const existingUser = await User.findOne({ email: normalizedEmail });
 
   if (existingUser) return error(res, 400, 'Email already registered');
 
   const user = await User.create({
     name,
-    email: email.toLowerCase(),
+    email: normalizedEmail,
     phone,
     password,
   });
@@ -27,8 +29,34 @@ const register = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const password = req.body.password;
+
+  // Environment-configured admin login (does not require a MongoDB user).
+  const adminEmail = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (adminEmail && adminPassword && email === adminEmail) {
+    if (password !== adminPassword) {
+      return error(res, 401, 'Invalid email or password');
+    }
+
+    const adminUser = {
+      id: 'env-admin',
+      name: 'Admin',
+      email: adminEmail,
+      role: 'admin',
+    };
+    const token = jwt.sign(
+      { id: adminUser.id, role: 'admin', email: adminEmail },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '30d' },
+    );
+
+    return success(res, 200, { token, user: adminUser }, 'User authenticated');
+  }
+
+  const user = await User.findOne({ email }).select('+password');
 
   if (!user || !(await user.matchPassword(password))) {
     return error(res, 401, 'Invalid email or password');
@@ -42,6 +70,10 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const getMe = asyncHandler(async (req, res) => {
+  if (req.user?.id === 'env-admin') {
+    return success(res, 200, { user: req.user }, 'Current user retrieved');
+  }
+
   const user = await User.findById(req.user.id).select('-password');
   if (!user) return error(res, 404, 'User not found');
   return success(res, 200, { user }, 'Current user retrieved');
