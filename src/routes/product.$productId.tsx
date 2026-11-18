@@ -49,6 +49,7 @@ function ProductPage() {
   const active = media[activeMedia] ?? media[0];
   const videoSrc = active?.kind === "video" ? active.src : "";
   const isEmbed = /youtube\.com|youtu\.be|vimeo\.com/.test(videoSrc);
+  const embedSrc = videoSrc.includes("youtu.be/") ? `https://www.youtube.com/embed/${videoSrc.split("youtu.be/")[1].split(/[?&]/)[0]}` : videoSrc.includes("youtube.com/watch") ? `https://www.youtube.com/embed/${new URL(videoSrc).searchParams.get("v")}` : videoSrc.includes("vimeo.com/") ? `https://player.vimeo.com/video/${videoSrc.split("vimeo.com/")[1].split(/[?&]/)[0]}` : videoSrc;
   const discount = product.compareAtPrice && product.compareAtPrice > product.price ? Math.round((1 - product.price / product.compareAtPrice) * 100) : 0;
 
   return <div className="min-h-screen bg-[#fbfaf7] text-[#242521]">
