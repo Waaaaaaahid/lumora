@@ -145,6 +145,16 @@ function StoreSettingsPage() {
             <Field id="s-wa-support" label="Customer Support — Number 2" hint="Include country code, e.g. 919876543210">
               <TextInput id="s-wa-support" inputMode="tel" value={form.whatsappSupportNumber || ""} onChange={(e) => updateForm({ ...form, whatsappSupportNumber: e.target.value })} placeholder="919876543210" />
             </Field>
+            <Field id="sales-number-order" label="Sales & Enquiries — number order" hint="Choose which WhatsApp number appears first in this section.">
+              <select id="sales-number-order" value={form.salesNumberOrder || "number1First"} onChange={(e) => updateForm({ ...form, salesNumberOrder: e.target.value as "number1First" | "number2First" })} className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm">
+                <option value="number1First">Number 1 first, Number 2 below</option><option value="number2First">Number 2 first, Number 1 below</option>
+              </select>
+            </Field>
+            <Field id="support-number-order" label="Customer Support — number order" hint="Choose which WhatsApp number appears first in this section.">
+              <select id="support-number-order" value={form.supportNumberOrder || "number1First"} onChange={(e) => updateForm({ ...form, supportNumberOrder: e.target.value as "number1First" | "number2First" })} className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm">
+                <option value="number1First">Number 1 first, Number 2 below</option><option value="number2First">Number 2 first, Number 1 below</option>
+              </select>
+            </Field>
             <Field id="s-wa" label="Old WhatsApp number (legacy)" hint="Kept for older pages; the enquiry popup uses the two numbers above">
               <TextInput id="s-wa" inputMode="tel" value={form.whatsappNumber} onChange={(e) => updateForm({ ...form, whatsappNumber: e.target.value })} />
             </Field>
