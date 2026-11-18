@@ -29,6 +29,8 @@ export interface MenuItem {
   price: number;
   category: string; // category slug (populated as Category on the real API)
   image: string;
+  gallery?: string[];
+  videoUrl?: string;
   available: boolean;
   popular: boolean;
   newArrival?: boolean;
