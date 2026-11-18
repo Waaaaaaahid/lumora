@@ -21,7 +21,7 @@ export const reviewService = {
   listFeatured: () => api.get<Review[]>("/reviews/featured", { auth: false }),
   create: (input: { orderId: string; rating: number; comment: string }) => api.post<Review>("/reviews", input),
   listAdmin: () => api.get<Review[]>("/reviews/admin"),
-  createAdmin: (input: { name: string; role?: string; rating: number; comment: string }) => api.post<Review>("/reviews/admin", input),
+  createAdmin: (input: { name: string; role?: string; rating: number; comment: string; itemId?: string }) => api.post<Review>("/reviews/admin", input),
   setVisibility: (id: string, visible: boolean) => api.patch<Review>(`/reviews/${id}/visibility`, { visible }),
   remove: (id: string) => api.delete<{ _id: string }>(`/reviews/${id}`),
 };
