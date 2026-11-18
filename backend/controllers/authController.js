@@ -62,6 +62,12 @@ const login = asyncHandler(async (req, res) => {
     return error(res, 401, 'Invalid email or password');
   }
 
+  // MongoDB-stored admin accounts are no longer allowed to authenticate as admins.
+  // Admin access must come exclusively from ADMIN_EMAIL / ADMIN_PASSWORD above.
+  if (user.role === 'admin') {
+    return error(res, 401, 'Invalid email or password');
+  }
+
   const token = generateToken(user._id);
   const userData = user.toObject();
   delete userData.password;
