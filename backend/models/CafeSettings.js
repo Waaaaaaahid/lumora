@@ -63,6 +63,8 @@ const cafeSettingsSchema = new mongoose.Schema(
     whatsappNumber: { type: String },
     whatsappSalesNumber: { type: String, default: '' },
     whatsappSupportNumber: { type: String, default: '' },
+    salesNumberOrder: { type: String, enum: ['number1First', 'number2First'], default: 'number1First' },
+    supportNumberOrder: { type: String, enum: ['number1First', 'number2First'], default: 'number1First' },
     announcementBar: { type: announcementBarSchema, default: () => ({}) },
   },
   { timestamps: true }
