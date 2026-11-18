@@ -19,6 +19,8 @@ export interface MenuItemFormValues {
   badge: string;
   category: string;
   image: string;
+  galleryUrls: string;
+  videoUrl: string;
   available: boolean;
   popular: boolean;
   newArrival: boolean;
@@ -36,6 +38,8 @@ export const emptyMenuItemForm: MenuItemFormValues = {
   badge: "",
   category: "",
   image: "",
+  galleryUrls: "",
+  videoUrl: "",
   available: true,
   popular: false,
   newArrival: false,
@@ -54,6 +58,8 @@ export function menuItemToForm(item: MenuItem): MenuItemFormValues {
     badge: item.badge ?? "",
     category: item.category,
     image: item.image,
+    galleryUrls: (item.gallery ?? []).join("\n"),
+    videoUrl: item.videoUrl ?? "",
     available: item.available,
     popular: item.popular,
     newArrival: item.newArrival ?? false,
@@ -184,6 +190,15 @@ export function MenuItemForm({
         </div>
         {values.image ? <img src={values.image} alt="Preview" className="mt-3 h-32 w-full rounded-xl object-cover" /> : null}
       </Field>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field id="galleryUrls" label="Additional product photos" hint="Paste one image URL per line (or comma-separated).">
+          <TextArea id="galleryUrls" value={values.galleryUrls} onChange={(event) => set("galleryUrls", event.target.value)} placeholder="https://.../photo-2.jpg\nhttps://.../photo-3.jpg" />
+        </Field>
+        <Field id="videoUrl" label="Product video URL (optional)" hint="Direct video URL such as MP4.">
+          <TextInput id="videoUrl" value={values.videoUrl} onChange={(event) => set("videoUrl", event.target.value)} placeholder="https://.../product-video.mp4" />
+        </Field>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <SwitchRow label="Available" checked={values.available} onChange={(value) => set("available", value)} />
