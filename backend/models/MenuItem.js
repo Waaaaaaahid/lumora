@@ -17,8 +17,6 @@ const menuItemSchema = new mongoose.Schema(
       publicId: { type: String },
     },
     gallery: { type: [String], default: [] },
-    videoUrl: { type: String, trim: true, default: "" },
-    gallery: { type: [String], default: [] },
     videoUrl: { type: String, default: "" },
     available: { type: Boolean, default: true },
     popular: { type: Boolean, default: false },
