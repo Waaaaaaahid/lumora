@@ -2,6 +2,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/response');
 const Review = require('../models/Review');
 const Order = require('../models/Order');
+const MenuItem = require('../models/MenuItem');
 
 const getItemReviews = asyncHandler(async (req, res) => {
   const reviews = await Review.find({ item: req.params.itemId, visible: true }).populate('user', 'name').sort('-createdAt');
@@ -27,9 +28,10 @@ const createReview = asyncHandler(async (req, res) => {
 });
 
 const createAdminReview = asyncHandler(async (req, res) => {
-  const { name, role, rating, comment } = req.body;
+  const { name, role, rating, comment, itemId } = req.body;
   if (!name || !comment || !Number.isInteger(Number(rating)) || Number(rating) < 1 || Number(rating) > 5) return error(res, 400, 'Name, review and a rating from 1 to 5 are required');
-  const review = await Review.create({ authorName: String(name).trim(), authorRole: role || 'Guest', rating: Number(rating), comment: String(comment).trim(), source: 'admin', visible: true });
+  if (itemId && !(await MenuItem.findById(itemId))) return error(res, 404, 'Product not found');
+  const review = await Review.create({ item: itemId || null, authorName: String(name).trim(), authorRole: role || 'Guest', rating: Number(rating), comment: String(comment).trim(), source: 'admin', visible: true });
   return success(res, 201, review, 'Custom testimonial published');
 });
 
