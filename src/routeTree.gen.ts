@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CartRouteImport } from './routes/cart'
@@ -41,6 +42,7 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductIdRoute = ProductIdRouteImport.update({ id: '/product/$id', path: '/product/$id', getParentRoute: () => rootRouteImport, } as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -168,6 +170,7 @@ const AdminOurWorkRoute = AdminOurWorkRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/product/$id': typeof ProductIdRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/our-work': typeof OurWorkRoute
@@ -196,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/admin/menu/new': typeof AdminMenuNewRoute
 }
 export interface FileRoutesByTo {
+  '/product/$id': typeof ProductIdRoute
   '/': typeof IndexRoute
   '/new-arrivals': typeof NewArrivalsRoute
   '/about': typeof AboutRoute
@@ -221,6 +225,7 @@ export interface FileRoutesByTo {
   '/admin/menu/new': typeof AdminMenuNewRoute
 }
 export interface FileRoutesById {
+  '/product/$id': typeof ProductIdRoute
   __root__: typeof rootRouteImport
   '/new-arrivals': typeof NewArrivalsRoute
   '/': typeof IndexRoute
@@ -250,6 +255,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/product/$id'
     | '/'
     | '/about'
     | '/our-work'
@@ -278,6 +284,7 @@ export interface FileRouteTypes {
     | '/admin/menu/new'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/product/$id'
     | '/'
     | '/about'
     | '/cart'
@@ -301,6 +308,7 @@ export interface FileRouteTypes {
     | '/admin/menu/$id'
     | '/admin/menu/new'
   id:
+    | '/product/$id'
     | '__root__'
     | '/'
     | '/about'
@@ -328,6 +336,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  ProductIdRoute: typeof ProductIdRoute
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   OurWorkRoute: typeof OurWorkRoute
@@ -347,6 +356,7 @@ export interface RootRouteChildren {
 }
 
 declare module '@tanstack/react-router' {
+  interface FileRoutesByPath { '/product/$id': { id: '/product/$id'; path: '/product/$id'; fullPath: '/product/$id'; preLoaderRoute: typeof ProductIdRouteImport; parentRoute: typeof rootRouteImport } }
   interface FileRoutesByPath {
     '/': {
       id: '/'
