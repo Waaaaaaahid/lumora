@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, ShoppingBag, Star, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Star, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
 import { menuService } from "@/services/menuService";
 import { reviewService } from "@/services/reviewService";
 import { useCart } from "@/context/CartContext";
@@ -57,7 +57,7 @@ function ProductPage() {
       <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-14">
         <div>
           <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} className="relative aspect-square overflow-hidden rounded-3xl bg-[#efeee8]">
-            {active?.kind === "video" ? (isEmbed ? <iframe src={active.src} title={product.name + " video"} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /> : <video src={active.src} controls playsInline className="h-full w-full object-contain" />) : <img src={active?.src || fallbackImage} alt={product.name} className="h-full w-full object-contain" />}
+            {active?.kind === "video" ? (isEmbed ? <iframe src={embedSrc} title={product.name + " video"} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /> : <video src={active.src} controls playsInline className="h-full w-full object-contain" />) : <img src={active?.src || fallbackImage} alt={product.name} className="h-full w-full object-contain" />}
             {media.length > 1 ? <><button type="button" onClick={() => goMedia(activeMedia - 1)} aria-label="Previous media" className="absolute left-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow"><ChevronLeft className="size-5" /></button><button type="button" onClick={() => goMedia(activeMedia + 1)} aria-label="Next media" className="absolute right-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow"><ChevronRight className="size-5" /></button><span className="absolute bottom-3 right-3 rounded-full bg-black/60 px-3 py-1.5 text-xs text-white">{activeMedia + 1} / {media.length}</span></> : null}
           </div>
           {media.length > 1 ? <div className="mt-3 flex gap-2 overflow-x-auto pb-1">{media.map((entry, index) => <button key={entry.src} type="button" onClick={() => setActiveMedia(index)} className={`relative size-20 shrink-0 overflow-hidden rounded-xl border-2 ${activeMedia === index ? "border-[#2e4031]" : "border-transparent"} bg-[#efeee8]`}>{entry.kind === "video" ? <span className="flex h-full items-center justify-center"><PlayCircle className="size-8" /></span> : <img src={entry.src} alt={`Product image ${index + 1}`} className="h-full w-full object-cover" />}</button>)}</div> : null}
@@ -67,7 +67,7 @@ function ProductPage() {
           <p className="mt-3 text-[10px] font-bold uppercase tracking-[.2em] text-[#78856c]">{product.category.replaceAll("-", " ")}</p>
           <h1 className="mt-2 text-3xl font-semibold leading-tight tracking-[-.04em] sm:text-4xl">{product.name}</h1>
           <a href="#customer-reviews" className="mt-4 inline-flex items-center gap-2 text-sm"><span className="flex text-[#a0782c]">{[1,2,3,4,5].map(n => <Star key={n} className={`size-4 ${n <= Math.round(rating) ? "fill-current" : ""}`} />)}</span><span className="text-[#73746c]">{rating > 0 ? rating.toFixed(1) : "No rating"}{count ? ` · ${count} reviews` : ""}</span></a>
-          <div className="mt-5 flex flex-wrap items-center gap-3"><span className="text-2xl font-bold">{formatCurrency(product.price)}</span>{discount > 0 ? <><span className="text-sm text-[#96968e] line-through">{formatCurrency(product.compareAtPrice!)}</span><span className="rounded-full bg-[#e9ede3] px-2.5 py-1 text-xs font-bold text-[#58755a">{discount}% OFF</span></> : null}</div>
+          <div className="mt-5 flex flex-wrap items-center gap-3"><span className="text-2xl font-bold">{formatCurrency(product.price)}</span>{discount > 0 ? <><span className="text-sm text-[#96968e] line-through">{formatCurrency(product.compareAtPrice!)}</span><span className="rounded-full bg-[#e9ede3] px-2.5 py-1 text-xs font-bold text-[#58755a]">{discount}% OFF</span></> : null}</div>
           <p className="mt-5 whitespace-pre-line text-sm leading-7 text-[#64665e]">{product.description}</p>
           {product.brand ? <p className="mt-4 text-sm text-[#73746c]">Brand: <span className="font-semibold text-[#242521]">{product.brand}</span></p> : null}
           {product.sku ? <p className="mt-2 text-xs text-[#85867e]">Product code: {product.sku}</p> : null}
