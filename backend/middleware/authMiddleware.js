@@ -1,5 +1,5 @@
 // backend/middleware/authMiddleware.js
-// JWT verification middleware. Verifies the user token and attaches the full user document.
+// JWT verification middleware. Verifies tokens and attaches the user context.
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('../utils/asyncHandler');
 const { error: sendError } = require('../utils/response');
@@ -20,6 +20,17 @@ const protect = asyncHandler(async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded?.id) {
       return sendError(res, 401, 'Not authorized, token failed');
+    }
+
+    // ENV admin is authenticated by its signed JWT and has no MongoDB record.
+    if (decoded.id === 'env-admin' && decoded.role === 'admin') {
+      req.user = {
+        id: 'env-admin',
+        name: 'Admin',
+        email: decoded.email || String(process.env.ADMIN_EMAIL || '').trim().toLowerCase(),
+        role: 'admin',
+      };
+      return next();
     }
 
     const user = await User.findById(decoded.id).select('-password');
