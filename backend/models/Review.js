@@ -16,8 +16,36 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// A customer can review each product once, even if it appears in multiple orders.
-reviewSchema.index({ user: 1, item: 1 }, { unique: true, sparse: true });
+// A customer can review each product once. Admin testimonials are excluded from this index.
+reviewSchema.index(
+  { user: 1, item: 1 },
+  {
+    name: 'customer_user_item_unique',
+    unique: true,
+    partialFilterExpression: { source: 'customer', user: { $exists: true }, item: { $exists: true } },
+  }
+);
 reviewSchema.index({ visible: 1, createdAt: -1 });
+
+// Replace the legacy sparse compound index with the safer customer-only partial index.
+reviewSchema.post('init', async function () {
+  try {
+    const collection = this.collection;
+    const indexes = await collection.indexes();
+    if (indexes.some((index) => index.name === 'user_1_item_1')) {
+      await collection.dropIndex('user_1_item_1');
+    }
+    await collection.createIndex(
+      { user: 1, item: 1 },
+      {
+        name: 'customer_user_item_unique',
+        unique: true,
+        partialFilterExpression: { source: 'customer', user: { $exists: true }, item: { $exists: true } },
+      }
+    );
+  } catch (_) {
+    // Index migration is best-effort; application validation still prevents duplicates.
+  }
+});
 
 module.exports = mongoose.model('Review', reviewSchema);
