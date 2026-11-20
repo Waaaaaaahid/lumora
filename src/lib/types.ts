@@ -10,6 +10,8 @@ export interface User {
   email: string;
   phone: string;
   role: UserRole;
+  codEnabled?: boolean;
+  onlinePaymentEnabled?: boolean;
   createdAt: string;
 }
 
