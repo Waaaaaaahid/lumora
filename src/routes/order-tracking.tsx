@@ -83,7 +83,7 @@ function OrderTrackingPage() {
                 <div><p className="text-xs uppercase tracking-wider text-muted-foreground">Your reference number</p><p className="mt-1 font-display text-2xl font-semibold tracking-wide">{order.code}</p><p className="mt-1 text-xs text-muted-foreground">Placed {formatDateTime(order.createdAt)}</p></div>
                 <span className={`rounded-full px-4 py-1.5 text-xs font-semibold ${order.orderStatus === "Cancelled" ? "bg-destructive/10 text-destructive" : statusBadgeColor[order.orderStatus] ?? "bg-secondary text-foreground"}`}>{order.orderStatus}</span>
               </div>
-              {order.orderStatus === "Cancelled" ? <p className="mt-8 rounded-2xl bg-destructive/8 p-5 text-sm text-muted-foreground">This order was cancelled. Please contact customer support if you need help.</p> : order.orderStatus === "Completed" ? <><DeliveredCelebration /><div className="mt-8 border-t border-border pt-8">{user ? <RatingSection orderId={order._id} /> : <p className="text-center text-sm text-muted-foreground">Sign in to rate your order.</p>}</div></> : (
+              {order.orderStatus === "Cancelled" ? <p className="mt-8 rounded-2xl bg-destructive/8 p-5 text-sm text-muted-foreground">This order was cancelled. Please contact customer support if you need help.</p> : order.orderStatus === "Completed" ? <><DeliveredCelebration /><div className="mt-8 border-t border-border pt-8">{user ? <RatingSection orderId={order._id} items={order.items} /> : <p className="text-center text-sm text-muted-foreground">Sign in to rate your order.</p>}</div></> : (
                 <ol className="mt-9 space-y-0">{ORDER_STATUS_FLOW.map((status, index) => { const done = index <= currentIndex; const isLast = index === ORDER_STATUS_FLOW.length - 1; return <li key={status} className="flex gap-4"><div className="flex flex-col items-center"><span className={`flex size-9 items-center justify-center rounded-full border-2 ${done ? "border-transparent bg-amber-gradient text-accent-foreground" : "border-border bg-card text-muted-foreground"}`}>{done ? <Check className="size-4" /> : <span className="size-2 rounded-full bg-current" />}</span>{!isLast ? <span className={`w-0.5 flex-1 ${index < currentIndex ? "bg-accent" : "bg-border"}`} /> : null}</div><div className={`pb-8 ${isLast ? "pb-0" : ""}`}><p className={`text-sm font-semibold ${done ? "" : "text-muted-foreground"}`}>{status}</p><p className="mt-1 text-xs text-muted-foreground">{statusCopy[status]}</p></div></li>; })}</ol>
               )}
               <div className="mt-8 grid gap-4 border-t border-border pt-6 sm:grid-cols-2"><div><p className="text-xs uppercase tracking-wider text-muted-foreground">Delivering to</p><p className="mt-1 text-sm">{order.customerDetails.address}</p></div><div className="sm:text-right"><p className="text-xs uppercase tracking-wider text-muted-foreground">Order total</p><p className="mt-1 font-display text-xl font-semibold">{formatCurrency(order.totalAmount, settings.currency)}</p><p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground sm:justify-end"><Truck className="size-3.5" />{order.paymentMethod === "cod" ? "Cash on delivery" : "Online payment"}</p></div></div>
@@ -102,30 +102,75 @@ function OrderTrackingPage() {
   );
 }
 
-function RatingSection({ orderId }: { orderId: string }) {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+function RatingSection({ orderId, items }: { orderId: string; items: { item: string; name: string; quantity: number }[] }) {
+  const [drafts, setDrafts] = useState<Record<string, { rating: number; comment: string; submitted?: boolean }>>({});
+  const [savingItem, setSavingItem] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Record<string, string>>({});
 
-  const submit = async () => {
-    if (!rating) { setMessage("Please choose a star rating first."); return; }
-    if (!comment.trim()) { setMessage("Please write a review."); return; }
-    setSaving(true); setMessage("");
-    try {
-      await reviewService.create({ orderId, rating, comment: comment.trim() });
-      setSubmitted(true);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Couldn't submit your review.");
-    } finally { setSaving(false); }
+  const updateDraft = (itemId: string, patch: Partial<{ rating: number; comment: string }>) => {
+    setDrafts((current) => ({
+      ...current,
+      [itemId]: { rating: 5, comment: "", ...current[itemId], ...patch },
+    }));
   };
 
-  if (submitted) {
-    return <section><div className="rounded-2xl border border-success/20 bg-success/5 p-5 text-center sm:p-6"><p className="font-semibold">Thank you for your feedback!</p><p className="mt-1 text-sm text-success">✓ Your overall order review has been submitted for approval.</p></div></section>;
-  }
+  const submit = async (itemId: string) => {
+    const draft = drafts[itemId] ?? { rating: 5, comment: "" };
+    if (!draft.comment.trim()) {
+      setMessages((current) => ({ ...current, [itemId]: "Please write a review." }));
+      return;
+    }
+    setSavingItem(itemId);
+    setMessages((current) => ({ ...current, [itemId]: "" }));
+    try {
+      await reviewService.create({ orderId, itemId, rating: draft.rating, comment: draft.comment.trim() });
+      setDrafts((current) => ({ ...current, [itemId]: { ...draft, submitted: true } }));
+    } catch (error) {
+      setMessages((current) => ({
+        ...current,
+        [itemId]: error instanceof Error ? error.message : "Couldn't submit your review.",
+      }));
+    } finally {
+      setSavingItem(null);
+    }
+  };
 
-  return <section><div className="rounded-2xl border border-border bg-secondary/30 p-5 sm:p-6"><div className="text-center"><p className="eyebrow text-accent">Your feedback matters</p><h2 className="mt-2 font-display text-2xl font-semibold">How was your order?</h2><p className="mt-2 text-sm text-muted-foreground">Rate your overall experience with this order. Your review will appear after our team approves it.</p></div><div className="mt-6 flex justify-center gap-1">{[1,2,3,4,5].map((star) => <button key={star} type="button" aria-label={`${star} stars`} onClick={() => setRating(star)}><Star className={`size-8 transition ${star <= rating ? "fill-accent text-accent" : "text-muted-foreground"}`} /></button>)}</div><TextArea className="mt-5" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Tell us about your overall experience..." /><Button className="mt-3 w-full sm:w-auto" variant="accent" loading={saving} onClick={() => void submit()}>Submit review</Button>{message ? <p className="mt-3 text-center text-sm text-destructive">{message}</p> : null}</div></section>;
+  return (
+    <section className="space-y-4">
+      <div className="text-center">
+        <p className="eyebrow text-accent">Your feedback matters</p>
+        <h2 className="mt-2 font-display text-2xl font-semibold">Review your products</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Share feedback for each product separately. Reviews appear on the product page after approval.</p>
+      </div>
+      {items.map((item) => {
+        const draft = drafts[item.item] ?? { rating: 5, comment: "" };
+        return (
+          <div key={item.item} className="rounded-2xl border border-border bg-secondary/30 p-5 sm:p-6">
+            {draft.submitted ? (
+              <div className="py-3 text-center">
+                <p className="font-semibold">Thank you for reviewing {item.name}!</p>
+                <p className="mt-1 text-sm text-success">Your product review has been submitted for approval.</p>
+              </div>
+            ) : (
+              <>
+                <h3 className="font-semibold">{item.name} <span className="text-xs font-normal text-muted-foreground">× {item.quantity}</span></h3>
+                <div className="mt-4 flex justify-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button key={star} type="button" aria-label={`${star} stars`} onClick={() => updateDraft(item.item, { rating: star })}>
+                      <Star className={`size-8 transition ${star <= draft.rating ? "fill-accent text-accent" : "text-muted-foreground"}`} />
+                    </button>
+                  ))}
+                </div>
+                <TextArea className="mt-4" value={draft.comment} onChange={(event) => updateDraft(item.item, { comment: event.target.value })} placeholder={`What did you think about ${item.name}?`} />
+                <Button className="mt-3 w-full" variant="accent" loading={savingItem === item.item} disabled={savingItem !== null} onClick={() => void submit(item.item)}>Submit product review</Button>
+                {messages[item.item] ? <p className="mt-3 text-center text-sm text-destructive">{messages[item.item]}</p> : null}
+              </>
+            )}
+          </div>
+        );
+      })}
+    </section>
+  );
 }
 
 const statusBadgeColor: Record<string, string> = { Pending: "bg-orange-500/10 text-orange-600", Confirmed: "bg-blue-500/10 text-blue-600", Preparing: "bg-amber-500/10 text-amber-600", Ready: "bg-green-500/10 text-green-600", "Out for Delivery": "bg-purple-500/10 text-purple-600", Completed: "bg-emerald-700/10 text-emerald-700" };
