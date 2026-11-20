@@ -40,6 +40,14 @@ const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find().select('-password').sort('-createdAt');
   return success(res, 200, users);
 });
+const updateUserPaymentPermissions = asyncHandler(async (req, res) => {
+  const { codEnabled, onlinePaymentEnabled } = req.body || {};
+  if (typeof codEnabled !== 'boolean' || typeof onlinePaymentEnabled !== 'boolean') return error(res, 400, 'Both payment settings must be true or false');
+  const user = await User.findByIdAndUpdate(req.params.id, { codEnabled, onlinePaymentEnabled }, { new: true, runValidators: true }).select('-password');
+  if (!user) return error(res, 404, 'User not found');
+  return success(res, 200, user, 'Customer payment permissions updated');
+});
+
 const deleteUser = asyncHandler(async (req, res) => {
   if (String(req.params.id) === String(req.user._id)) return error(res, 400, 'You cannot delete your own account');
   const user = await User.findByIdAndDelete(req.params.id);
@@ -55,4 +63,4 @@ const updateUserRole = asyncHandler(async (req, res) => {
   return success(res, 200, user, 'User role updated');
 });
 
-module.exports = { getProfile, updateProfile, getUsers, deleteUser, updateUserRole };
+module.exports = { getProfile, updateProfile, getUsers, deleteUser, updateUserRole, updateUserPaymentPermissions };
