@@ -13,5 +13,6 @@ router
 router.get('/', protect, admin, userController.getUsers);
 router.delete('/:id', protect, admin, userController.deleteUser);
 router.put('/:id/role', protect, admin, userController.updateUserRole);
+router.put('/:id/payment-permissions', protect, admin, userController.updateUserPaymentPermissions);
 
 module.exports = router;
