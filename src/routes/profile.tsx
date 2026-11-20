@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, Star } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProtectedRoute } from "@/components/ProtectedRoute/ProtectedRoute";
 import { Button } from "@/components/ui/AppButton";
 import { Field, TextInput } from "@/components/ui/Field";
@@ -10,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useCafe } from "@/context/CafeContext";
 import { useToast } from "@/context/ToastContext";
 import { orderService } from "@/services/orderService";
+import { reviewService } from "@/services/reviewService";
 import { formatCurrency, formatDate, initials } from "@/utils/format";
 
 export const Route = createFileRoute("/profile")({
@@ -38,6 +40,13 @@ function ProfilePage() {
     phone: user?.phone ?? "",
   });
   const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
+  const [reviewDrafts, setReviewDrafts] = useState<Record<string, { rating: number; comment: string }>>({});
+  const reviewMutation = useMutation({
+    mutationFn: reviewService.create,
+    onSuccess: () => { notify("Product review submitted for approval", { variant: "success" }); void queryClient.invalidateQueries({ queryKey: ["my-orders", user?._id] }); },
+    onError: (error: Error) => notify(error.message || "Could not submit review", { variant: "error" }),
+  });
 
   const ordersQuery = useQuery({
     queryKey: ["my-orders", user?._id],
@@ -154,6 +163,28 @@ function ProfilePage() {
                         </Button>
                       </Link>
                     </div>
+                    {order.orderStatus === "Completed" ? (
+                      <div className="mt-4 w-full space-y-3 border-t border-border pt-3">
+                        <p className="text-xs font-semibold text-muted-foreground">Review purchased products</p>
+                        {order.items.map((item) => {
+                          const draft = reviewDrafts[item.item] ?? { rating: 5, comment: "" };
+                          return (
+                            <div key={item.item} className="rounded-xl bg-secondary/40 p-3">
+                              <p className="text-sm font-semibold">{item.name}</p>
+                              <div className="mt-2 flex gap-1">
+                                {[1, 2, 3, 4, 5].map((rating) => (
+                                  <button key={rating} type="button" onClick={() => setReviewDrafts((current) => ({ ...current, [item.item]: { ...draft, rating } }))} aria-label={`${rating} stars`}>
+                                    <Star className={`size-5 ${rating <= draft.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
+                                  </button>
+                                ))}
+                              </div>
+                              <textarea value={draft.comment} onChange={(event) => setReviewDrafts((current) => ({ ...current, [item.item]: { ...draft, comment: event.target.value } }))} placeholder="Share your experience with this product..." className="mt-2 min-h-20 w-full rounded-xl border border-border bg-background p-3 text-sm" />
+                              <Button size="sm" className="mt-2" disabled={!draft.comment.trim() || reviewMutation.isPending} loading={reviewMutation.isPending} onClick={() => reviewMutation.mutate({ orderId: order._id, itemId: item.item, rating: draft.rating, comment: draft.comment })}>Submit review</Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                   </li>
                 ))}
               </ul>
