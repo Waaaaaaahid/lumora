@@ -30,6 +30,7 @@ export const adminService = {
 
   listUsers: () => api.get<User[]>("/users"),
   updateUserRole: (id: string, role: User["role"]) => api.put<User>(`/users/${id}/role`, { role }),
+  updateUserPaymentPermissions: (id: string, codEnabled: boolean, onlinePaymentEnabled: boolean) => api.put<User>(`/users/${id}/payment-permissions`, { codEnabled, onlinePaymentEnabled }),
   deleteUser: (id: string) => api.delete<{ _id: string }>(`/users/${id}`),
   updateSettings: (input: Partial<CafeSettings>) => api.put<CafeSettings>("/cafe/settings", input),
 
