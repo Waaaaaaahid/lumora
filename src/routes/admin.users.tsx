@@ -41,6 +41,12 @@ function AdminUsers() {
     onError: () => notify("Couldn't update role", { variant: "error" }),
   });
 
+  const paymentMutation = useMutation({
+    mutationFn: (input: { id: string; codEnabled: boolean; onlinePaymentEnabled: boolean }) => adminService.updateUserPaymentPermissions(input.id, input.codEnabled, input.onlinePaymentEnabled),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ["admin-users"] }); notify("Customer payment settings updated", { variant: "success" }); },
+    onError: () => notify("Could not update payment settings", { variant: "error" }),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminService.deleteUser(id),
     onSuccess: () => {
@@ -68,13 +74,15 @@ function AdminUsers() {
         <EmptyState title="No users yet" description="Registered customers will appear here." />
       ) : (
         <div className="overflow-x-auto rounded-3xl border border-border bg-card shadow-soft">
-          <table className="w-full min-w-[680px] text-left text-sm">
+          <table className="w-full min-w-[900px] text-left text-sm">
             <thead>
               <tr className="border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="px-5 py-3 font-semibold">User</th>
                 <th className="px-5 py-3 font-semibold">Phone</th>
                 <th className="px-5 py-3 font-semibold">Joined</th>
                 <th className="px-5 py-3 font-semibold">Role</th>
+                <th className="px-5 py-3 font-semibold">COD</th>
+                <th className="px-5 py-3 font-semibold">Online</th>
                 <th className="px-5 py-3 text-right font-semibold">Actions</th>
               </tr>
             </thead>
@@ -106,6 +114,12 @@ function AdminUsers() {
                       <option value="user">User</option>
                       <option value="admin">Admin</option>
                     </Select>
+                  </td>
+                  <td className="px-5 py-3">
+                    <Select value={user.codEnabled === true ? "on" : "off"} disabled={paymentMutation.isPending} onChange={(event) => paymentMutation.mutate({ id: user._id, codEnabled: event.target.value === "on", onlinePaymentEnabled: user.onlinePaymentEnabled !== false })} className="w-28"><option value="off">Off</option><option value="on">On</option></Select>
+                  </td>
+                  <td className="px-5 py-3">
+                    <Select value={user.onlinePaymentEnabled === false ? "off" : "on"} disabled={paymentMutation.isPending} onChange={(event) => paymentMutation.mutate({ id: user._id, codEnabled: user.codEnabled === true, onlinePaymentEnabled: event.target.value === "on" })} className="w-28"><option value="off">Off</option><option value="on">On</option></Select>
                   </td>
                   <td className="px-5 py-3 text-right">
                     <Button
