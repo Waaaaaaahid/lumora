@@ -52,8 +52,13 @@ const createOrder = asyncHandler(async (req, res) => {
   if (!req.user?.id) return error(res, 401, 'Login required to place an order');
   const { customerDetails, items, subtotal, tax, deliveryFee, totalAmount, paymentMethod, couponCode } = req.body;
 
-  // Online payments are enabled whenever the Razorpay credentials are configured.
-  // Do not gate checkout behind a separate ENABLE_ONLINE_PAYMENTS flag.
+  const User = require('../models/User');
+  const customer = await User.findById(req.user.id).select('codEnabled onlinePaymentEnabled');
+  if (!customer) return error(res, 401, 'Customer account not found');
+  if (!['cod', 'online'].includes(paymentMethod)) return error(res, 400, 'Invalid payment method');
+  if (paymentMethod === 'cod' && customer.codEnabled !== true) return error(res, 403, 'Cash on Delivery is not enabled for your account');
+  if (paymentMethod === 'online' && customer.onlinePaymentEnabled === false) return error(res, 403, 'Online payment is not enabled for your account');
+
   if (!Array.isArray(items) || items.length === 0) return error(res, 400, 'Order must contain at least one item');
 
   const itemIds = items.map((item) => item.item);
