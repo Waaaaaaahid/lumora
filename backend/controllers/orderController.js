@@ -179,6 +179,8 @@ const subscribeToOrder = asyncHandler(async (req, res) => {
   const orderId = req.params.id;
   const order = await Order.findById(orderId).populate('user', 'name email phone role');
   if (!order) return error(res, 404, 'Order not found');
+  const isOwner = order.user && String(order.user._id || order.user) === String(req.user?.id || req.user?._id);
+  if (!isOwner && req.user?.role !== 'admin') return error(res, 403, 'Not authorized to view this order');
   if (req.user?.role === 'admin' && !isVisibleToAdmin(order)) return error(res, 404, 'Order not found');
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
