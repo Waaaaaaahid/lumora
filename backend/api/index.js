@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Backend failed to start',
-      error: error.message,
+      // Keep internal exception details in server logs, never expose them publicly.
     });
   }
 };
