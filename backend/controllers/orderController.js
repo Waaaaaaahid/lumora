@@ -3,6 +3,7 @@ const { success, error } = require('../utils/response');
 const Order = require('../models/Order');
 const MenuItem = require('../models/MenuItem');
 const Coupon = require('../models/Coupon');
+const CafeSettings = require('../models/CafeSettings');
 const crypto = require('crypto');
 
 const orderSubscribers = new Map();
@@ -50,7 +51,7 @@ async function resolveCoupon(code, subtotal) {
 
 const createOrder = asyncHandler(async (req, res) => {
   if (!req.user?.id) return error(res, 401, 'Login required to place an order');
-  const { customerDetails, items, subtotal, tax, deliveryFee, totalAmount, paymentMethod, couponCode } = req.body;
+  const { customerDetails, items, subtotal, totalAmount, paymentMethod, couponCode } = req.body;
 
   const User = require('../models/User');
   const customer = await User.findById(req.user.id).select('codEnabled onlinePaymentEnabled');
@@ -73,12 +74,19 @@ const createOrder = asyncHandler(async (req, res) => {
     sanitizedItems.push({ item: menuItem._id, name: menuItem.name, price: Number(menuItem.price), quantity });
   }
 
-  const computedSubtotal = sanitizedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const computedSubtotal = Number(sanitizedItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2));
   const clientSubtotal = Number(subtotal);
-  const taxAmount = Number(tax);
-  const deliveryAmount = Number(deliveryFee);
   const clientTotal = Number(totalAmount);
-  if (!Number.isFinite(taxAmount) || taxAmount < 0 || !Number.isFinite(deliveryAmount) || deliveryAmount < 0 || clientSubtotal !== Number(computedSubtotal.toFixed(2))) return error(res, 400, 'Order totals are invalid');
+  if (!Number.isFinite(clientSubtotal) || clientSubtotal !== computedSubtotal) return error(res, 400, 'Order totals are invalid');
+
+  // Never trust tax or delivery charges supplied by the browser. Recalculate
+  // them from server-side store settings using the same storefront pricing rules.
+  const storeSettings = await CafeSettings.findOne().select('taxPercentage deliveryFee');
+  const taxPercentage = Number(storeSettings?.taxPercentage ?? 5);
+  const configuredDeliveryFee = Number(storeSettings?.deliveryFee ?? 49);
+  if (!Number.isFinite(taxPercentage) || taxPercentage < 0 || !Number.isFinite(configuredDeliveryFee) || configuredDeliveryFee < 0) {
+    return error(res, 503, 'Store pricing is temporarily unavailable');
+  }
 
   let coupon = null;
   let discount = 0;
@@ -89,6 +97,8 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 
   const discountedSubtotal = Number((computedSubtotal - discount).toFixed(2));
+  const taxAmount = Math.round((discountedSubtotal * taxPercentage) / 100);
+  const deliveryAmount = discountedSubtotal === 0 || discountedSubtotal > 999 ? 0 : configuredDeliveryFee;
   const computedTotal = Number((discountedSubtotal + taxAmount + deliveryAmount).toFixed(2));
   if (clientTotal !== computedTotal) return error(res, 400, 'Order totals are invalid');
 
@@ -111,7 +121,7 @@ const createOrder = asyncHandler(async (req, res) => {
     couponCode: coupon?.code ?? null,
     tax: taxAmount,
     deliveryFee: deliveryAmount,
-    totalAmount: clientTotal,
+    totalAmount: computedTotal,
     paymentMethod,
   });
 
