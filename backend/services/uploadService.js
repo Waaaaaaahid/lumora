@@ -49,4 +49,4 @@ const deleteCloudinaryImage = async (publicId) => {
   }
 };
 
-module.exports = { buildUploader, isCloudinaryConfigured, deleteCloudinaryImage };
+const buildVideoUploader = (folder = 'lumora/portfolio/videos') => {\n  if (!isCloudinaryConfigured()) throw new Error('Cloudinary is not configured.');\n  configureCloudinary();\n  const storage = new CloudinaryStorage({ cloudinary, params: { folder, resource_type: 'video', allowed_formats: ['mp4', 'webm'] } });\n  return multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });\n};\n\nmodule.exports = { buildUploader, buildVideoUploader, isCloudinaryConfigured, deleteCloudinaryImage };
