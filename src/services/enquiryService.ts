@@ -1,0 +1,4 @@
+import { api } from '@/services/api';
+export type EnquiryStatus='New'|'Contacted'|'Follow-up'|'Converted'|'Closed';
+export interface Enquiry {_id:string;name:string;phone:string;category:string;location:string;message:string;status:EnquiryStatus;adminNotes:string;createdAt:string;updatedAt:string;}
+export const enquiryService={create:(data:Pick<Enquiry,'name'|'phone'|'category'|'location'|'message'>)=>api.post<{_id:string;createdAt:string}>('/enquiries',data,{auth:false}),list:()=>api.get<Enquiry[]>('/enquiries'),update:(id:string,data:Partial<Pick<Enquiry,'status'|'adminNotes'>>)=>api.patch<Enquiry>('/enquiries/'+id,data)};
