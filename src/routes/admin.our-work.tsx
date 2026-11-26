@@ -47,7 +47,7 @@ function AdminOurWorkPage() {
     } finally { setUploading(false); if (fileInput.current) fileInput.current.value = ""; }
   };
 
-  const addVideo = () => { const url = videoUrl.trim(); if (!url || !/^https?:\\/\\//i.test(url)) { notify("Enter a valid video URL (https://)", { variant: "error" }); return; } setForm(current => ({ ...current, images: [...current.images, { url, mediaType: "video" as const, alt: current.title || "Project video" }] })); setVideoUrl(""); };
+  const addVideo = () => { const url = videoUrl.trim(); if (!url || !/^https?:\/\//i.test(url)) { notify("Enter a valid video URL (https://)", { variant: "error" }); return; } setForm(current => ({ ...current, images: [...current.images, { url, mediaType: "video" as const, alt: current.title || "Project video" }] })); setVideoUrl(""); };
 
   const editProject = (project: PortfolioProject) => {
     setEditing(project._id);
