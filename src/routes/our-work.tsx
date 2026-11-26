@@ -13,11 +13,11 @@ export const Route = createFileRoute("/our-work")({
 });
 
 function youtubeEmbed(url: string) {
-  const match = url.match(/(?:youtube\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return match ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 function youtubeThumbnail(url: string) {
-  const match = url.match(/(?:youtube\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
 }
 function OurWorkPage() {
