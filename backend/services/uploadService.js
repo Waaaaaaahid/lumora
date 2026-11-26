@@ -28,10 +28,11 @@ const buildUploader = (folder = 'cafe-menu') => {
     cloudinary,
     params: {
       folder,
-      allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm'],\n      resource_type: 'auto',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm'],
+      resource_type: 'auto',
     },
   });
-  return multer({ storage });
+  return multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 };
 
 /**
