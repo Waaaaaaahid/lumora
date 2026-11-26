@@ -12,9 +12,9 @@ import type { AnnouncementAnimation, AnnouncementItem } from "@/lib/types";
 export const Route = createFileRoute("/admin/settings")({
   head: () => ({
     meta: [
-      { title: "Store settings — Admin" },
-      { name: "description", content: "Update store details, delivery fee, tax, currency and social links." },
-      { property: "og:title", content: "Store settings — Zrcart Admin" },
+      { title: "Website settings — Admin" },
+      { name: "description", content: "Manage website branding, contact details and social links." },
+      { property: "og:title", content: "Website settings — Zrcart Admin" },
       { property: "og:description", content: "Manage the store profile used across the storefront." },
     ],
   }),
@@ -100,7 +100,7 @@ function StoreSettingsPage() {
       queryClient.setQueryData(["cafe-settings"], savedSettings);
       dirtyRef.current = false;
       await queryClient.invalidateQueries({ queryKey: ["cafe-settings"] });
-      notify("Store settings updated", { variant: "success" });
+      notify("Website settings updated", { variant: "success" });
     } catch {
       notify("Could not save settings", { variant: "error" });
     } finally {
@@ -110,16 +110,16 @@ function StoreSettingsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-semibold">Store settings</h1>
+      <h1 className="font-display text-3xl font-semibold">Website settings</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        These values drive the storefront, checkout totals and footer.
+        These details are displayed on the public website and enquiry pages.
       </p>
 
       <form onSubmit={onSubmit} className="mt-8 grid gap-6 lg:grid-cols-2">
         <section className="rounded-3xl border border-border bg-card p-6 shadow-soft">
           <h2 className="font-display text-lg font-semibold">Profile</h2>
           <div className="mt-5 space-y-4">
-            <Field id="s-name" label="Store name">
+            <Field id="s-name" label="Website name">
               <TextInput id="s-name" value={form.name} onChange={(e) => updateForm({ ...form, name: e.target.value })} />
             </Field>
             <Field id="s-logo" label="Logo URL" hint="Cloudinary URL once uploads are connected">
@@ -159,7 +159,7 @@ function StoreSettingsPage() {
                 <option value="number1First">Number 1 first, Number 2 below</option><option value="number2First">Number 2 first, Number 1 below</option>
               </select>
             </Field>
-            <Field id="s-wa" label="Old WhatsApp number (legacy)" hint="Kept for older pages; the enquiry popup uses the two numbers above">
+            <Field id="s-wa" label="WhatsApp contact (legacy)" hint="Kept for older pages; the enquiry popup uses the two numbers above">
               <TextInput id="s-wa" inputMode="tel" value={form.whatsappNumber} onChange={(e) => updateForm({ ...form, whatsappNumber: e.target.value })} />
             </Field>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -176,20 +176,7 @@ function StoreSettingsPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-          <h2 className="font-display text-lg font-semibold">Commerce</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-3">
-            <Field id="s-fee" label="Delivery fee">
-              <TextInput id="s-fee" type="number" value={form.deliveryFee} onChange={(e) => updateForm({ ...form, deliveryFee: Number(e.target.value) })} />
-            </Field>
-            <Field id="s-tax" label="Tax %">
-              <TextInput id="s-tax" type="number" value={form.taxPercentage} onChange={(e) => updateForm({ ...form, taxPercentage: Number(e.target.value) })} />
-            </Field>
-            <Field id="s-cur" label="Currency">
-              <TextInput id="s-cur" value={form.currency} onChange={(e) => updateForm({ ...form, currency: e.target.value })} />
-            </Field>
-          </div>
-        </section>
+
 
         <section className="rounded-3xl border border-border bg-card p-6 shadow-soft lg:col-span-2">
           <div className="flex flex-wrap items-start justify-between gap-4">
