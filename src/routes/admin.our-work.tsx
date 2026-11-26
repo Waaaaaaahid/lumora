@@ -29,7 +29,7 @@ function AdminOurWorkPage() {
   const galleryCategories = (categoriesQuery.data || []).filter(category => category.active).map(category => category.name);
   const projects = projectsQuery.data ?? [];
 
-  const youtubeEmbed = (url: string) => { const match = url.match(/(?:youtube\\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return match ? `https://www.youtube.com/embed/${match[1]}` : null; };
+  const youtubeEmbed = (url: string) => { const match = url.match(/(?:youtube\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return match ? `https://www.youtube.com/embed/${match[1]}` : null; };
   const reset = () => { setEditing(null); setForm(emptyForm); if (fileInput.current) fileInput.current.value = ""; };
   const uploadImages = async (files: FileList | null) => {
     if (!files?.length) return;
