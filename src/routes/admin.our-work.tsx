@@ -24,7 +24,7 @@ function AdminOurWorkPage() {
   const [uploading, setUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
   const [saving, setSaving] = useState(false);
-  const projectsQuery = useQuery({ queryKey: ["admin-portfolio"], queryFn: portfolioService.listAdmin });
+  const projectsQuery = useQuery({ queryKey: ["admin-portfolio"], queryFn: portfolioService.listAdmin });\n  const categoriesQuery = useQuery({ queryKey: ["gallery-categories"], queryFn: adminService.listCategories });\n  const galleryCategories = (categoriesQuery.data || []).filter(category => category.active).map(category => category.name);
   const projects = projectsQuery.data ?? [];
 
   const reset = () => { setEditing(null); setForm(emptyForm); if (fileInput.current) fileInput.current.value = ""; };
@@ -80,7 +80,7 @@ function AdminOurWorkPage() {
       <div className="mb-6 flex items-center justify-between gap-3"><h2 className="font-display text-xl font-semibold">{editing ? "Edit project" : "Add a project"}</h2>{editing ? <Button type="button" variant="outline" size="sm" onClick={reset}><X className="mr-2 size-4" /> Cancel edit</Button> : null}</div>
       <div className="grid gap-4 md:grid-cols-2">
         <Field id="portfolio-title" label="Project title"><TextInput id="portfolio-title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Warm modern kitchen" /></Field>
-        <Field id="portfolio-category" label="Design category"><TextInput id="portfolio-category" required value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="Kitchen, Modular Kitchen, Living Room..." /></Field>
+        <Field id="portfolio-category" label="Gallery category"><select id="portfolio-category" required value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm">{Array.from(new Set([form.category, ...galleryCategories, "Living Room", "Bedroom", "Kitchen", "Full Home", "Office", "Other"].filter(Boolean))).map(category => <option key={category} value={category}>{category}</option>)}</select><p className="mt-1 text-xs text-muted-foreground">Add/edit categories from Gallery Categories in the admin menu.</p></Field>
         <Field id="portfolio-location" label="Location (optional)"><TextInput id="portfolio-location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. New Delhi" /></Field>
         <Field id="portfolio-order" label="Display order"><TextInput id="portfolio-order" type="number" value={String(form.sortOrder)} onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) || 0 })} /></Field>
         <div className="md:col-span-2"><Field id="portfolio-description" label="Project description"><TextArea id="portfolio-description" required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Describe the materials, layout, style and special details..." /></Field></div>
