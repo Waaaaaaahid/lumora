@@ -24,7 +24,9 @@ function AdminOurWorkPage() {
   const [uploading, setUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
   const [saving, setSaving] = useState(false);
-  const projectsQuery = useQuery({ queryKey: ["admin-portfolio"], queryFn: portfolioService.listAdmin });\n  const categoriesQuery = useQuery({ queryKey: ["gallery-categories"], queryFn: adminService.listCategories });\n  const galleryCategories = (categoriesQuery.data || []).filter(category => category.active).map(category => category.name);
+  const projectsQuery = useQuery({ queryKey: ["admin-portfolio"], queryFn: portfolioService.listAdmin });
+  const categoriesQuery = useQuery({ queryKey: ["gallery-categories"], queryFn: adminService.listCategories });
+  const galleryCategories = (categoriesQuery.data || []).filter(category => category.active).map(category => category.name);
   const projects = projectsQuery.data ?? [];
 
   const reset = () => { setEditing(null); setForm(emptyForm); if (fileInput.current) fileInput.current.value = ""; };
