@@ -13,10 +13,10 @@ export const Route = createFileRoute("/our-work")({
 });
 
 function OurWorkPage() {
-  const [activeProject, setActiveProject] = useState<PortfolioProject | null>(null);
+  const [activeProject, setActiveProject] = useState<PortfolioProject | null>(null);\n  const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeCategory, setActiveCategory] = useState("All");
   const projectsQuery = useQuery({ queryKey: ["portfolio-projects"], queryFn: portfolioService.list, staleTime: 30_000 });
-  const projects = projectsQuery.data ?? [];
+  const projects = projectsQuery.data ?? [];\n  const categories = ["All", ...Array.from(new Set(projects.map((project) => project.category))).sort()];\n  const visibleProjects = selectedCategory === "All" ? projects : projects.filter((project) => project.category === selectedCategory);
   const categories = ["All", ...Array.from(new Set(projects.map(p => p.category).filter(Boolean)))];
 
   return (
@@ -31,12 +31,12 @@ function OurWorkPage() {
       <section className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 sm:py-16 lg:px-14">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8b765d]">Selected projects</p><h2 className="mt-2 font-serif text-3xl sm:text-4xl">Designed with intention</h2></div>
-          <span className="text-xs text-[#85867e]">{projects.length} {projects.length === 1 ? "project" : "projects"}</span>
+          <span className="text-xs text-[#85867e]">{visibleProjects.length} {visibleProjects.length === 1 ? "project" : "projects"}</span>
         </div>
         <div className="mb-6 flex flex-wrap gap-2">{categories.map(category => <button key={category} type="button" onClick={() => setActiveCategory(category)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${activeCategory===category ? "border-[#292a25] bg-[#292a25] text-white" : "border-[#d6d3ca] bg-white text-[#55564f] hover:bg-[#eae8e2]"}`}>{category}</button>)}</div>
-        {projectsQuery.isLoading ? <div className="grid gap-7 md:grid-cols-2">{[1,2,3,4].map((n) => <div key={n} className="h-[420px] animate-pulse rounded-3xl bg-[#e8e6e0]" />)}</div> :
+        {!projectsQuery.isLoading && projects.length > 0 ? <div className="mb-7 flex flex-wrap gap-2">{categories.map(category => <button key={category} type="button" onClick={() => setSelectedCategory(category)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${selectedCategory === category ? "border-[#292a25] bg-[#292a25] text-white" : "border-[#d8d5cc] bg-white text-[#55564f] hover:border-[#8b765d]"}`}>{category}</button>)}</div> : null}\n        {projectsQuery.isLoading ? <div className="grid gap-7 md:grid-cols-2">{[1,2,3,4].map((n) => <div key={n} className="h-[420px] animate-pulse rounded-3xl bg-[#e8e6e0]" />)}</div> :
         projectsQuery.isError ? <div className="rounded-3xl border border-dashed border-[#d6d3ca] p-12 text-center text-sm text-[#77786f]">Our work couldn't load right now. Please try again shortly.</div> :
-        projects.length ? <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+        visibleProjects.length ? <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
           {projects.filter(project => activeCategory === "All" || project.category === activeCategory).map((project) => <button key={project._id} type="button" onClick={() => setActiveProject(project)} className="group overflow-hidden rounded-3xl bg-white text-left shadow-[0_12px_40px_rgba(35,35,28,.07)] transition hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(35,35,28,.12)]">
             <div className="relative aspect-[1.32] overflow-hidden bg-[#e8e6e0]">{project.images[0]?.mediaType === "video" ? <video src={project.images[0]?.url} muted playsInline className="h-full w-full object-cover transition duration-700 group-hover:scale-105" /> : <img src={project.images[0]?.url} alt={project.images[0]?.alt || project.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />}<span className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#38382f]">{project.category}</span><span className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/90 text-[#34352e]"><ArrowUpRight className="size-4" /></span></div>
             <div className="p-6 sm:p-7"><h3 className="font-serif text-2xl">{project.title}</h3>{project.location ? <p className="mt-2 flex items-center gap-1.5 text-xs text-[#85867e]"><MapPin className="size-3.5" />{project.location}</p> : null}<p className="mt-3 line-clamp-3 text-sm leading-6 text-[#77786f]">{project.description}</p><p className="mt-5 text-[10px] font-bold uppercase tracking-[.17em] text-[#8b765d]">View project <span aria-hidden>↗</span></p></div>
