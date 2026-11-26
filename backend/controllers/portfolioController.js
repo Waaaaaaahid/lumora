@@ -1,7 +1,7 @@
 const PortfolioProject = require('../models/PortfolioProject');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, error } = require('../utils/response');
-const { deleteCloudinaryImage } = require('../services/uploadService');
+const { deleteCloudinaryMedia } = require('../services/uploadService');
 
 const uploadImage = asyncHandler(async (req, res) => {
   if (!req.file?.path) return error(res, 400, 'Please choose an image to upload');
@@ -33,7 +33,7 @@ const createProject = asyncHandler(async (req, res) => {
 const updateProject = asyncHandler(async (req, res) => {
   const project = await PortfolioProject.findById(req.params.id);
   if (!project) return error(res, 404, 'Portfolio project not found');
-  const previousImages = project.images.map((image) => ({ publicId: image.publicId, url: image.url }));
+  const previousImages = project.images.map((image) => ({ publicId: image.publicId, url: image.url, mediaType: image.mediaType || 'image' }));
   const allowed = ['title', 'category', 'description', 'location', 'images', 'featured', 'published', 'sortOrder'];
   for (const key of allowed) if (key in req.body) project[key] = req.body[key];
   if (!project.title?.trim() || !project.category?.trim() || !project.description?.trim()) {
@@ -45,7 +45,7 @@ const updateProject = asyncHandler(async (req, res) => {
   await project.save();
   const retainedIds = new Set(project.images.map((image) => image.publicId).filter(Boolean));
   const removedImages = previousImages.filter((image) => image.publicId && !retainedIds.has(image.publicId));
-  await Promise.all(removedImages.map((image) => deleteCloudinaryImage(image.publicId)));
+  await Promise.all(removedImages.map((image) => deleteCloudinaryMedia(image.publicId, image.mediaType)));
   return success(res, 200, project, 'Portfolio project updated');
 });
 
@@ -53,7 +53,7 @@ const deleteProject = asyncHandler(async (req, res) => {
   const project = await PortfolioProject.findById(req.params.id);
   if (!project) return error(res, 404, 'Portfolio project not found');
   await PortfolioProject.findByIdAndDelete(req.params.id);
-  await Promise.all((project.images || []).map((image) => deleteCloudinaryImage(image.publicId)));
+  await Promise.all((project.images || []).map((image) => deleteCloudinaryMedia(image.publicId, image.mediaType)));
   return success(res, 200, { _id: req.params.id }, 'Portfolio project deleted');
 });
 
