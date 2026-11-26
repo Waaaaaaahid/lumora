@@ -5,8 +5,8 @@ import { AdminShell } from "@/components/admin/AdminShell";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Console — Lumora Curio" },
-      { name: "description", content: "Manage menu, orders, users and settings for Lumora Curio." },
+      { title: "Design Studio Admin — Lumora Curio" },
+      { name: "description", content: "Manage interior portfolio, gallery categories, enquiries and website settings for Lumora Curio." },
       { property: "og:title", content: "Admin Console — Lumora Curio" },
       { property: "og:description", content: "Manage menu, orders, users and settings for Lumora Curio." },
     ],
