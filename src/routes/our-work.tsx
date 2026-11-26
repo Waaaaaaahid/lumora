@@ -14,13 +14,11 @@ export const Route = createFileRoute("/our-work")({
 
 function OurWorkPage() {
   const [activeProject, setActiveProject] = useState<PortfolioProject | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState("All");
   const [activeCategory, setActiveCategory] = useState("All");
   const projectsQuery = useQuery({ queryKey: ["portfolio-projects"], queryFn: portfolioService.list, staleTime: 30_000 });
   const projects = projectsQuery.data ?? [];
-  const categories = ["All", ...Array.from(new Set(projects.map((project) => project.category))).sort()];
-  const visibleProjects = selectedCategory === "All" ? projects : projects.filter((project) => project.category === selectedCategory);
-  const categories = ["All", ...Array.from(new Set(projects.map(p => p.category).filter(Boolean)))].sort((a,b)=>a==="All"?-1:b==="All"?1:a.localeCompare(b));\n  const visibleProjects = activeCategory === "All" ? projects : projects.filter(project => project.category === activeCategory);
+  const categories = ["All", ...Array.from(new Set(projects.map(p => p.category).filter(Boolean)))].sort((a,b)=>a==="All"?-1:b==="All"?1:a.localeCompare(b));
+  const visibleProjects = activeCategory === "All" ? projects : projects.filter(project => project.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-[#f5f4f1] text-[#242521]">
