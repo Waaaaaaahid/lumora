@@ -6,7 +6,8 @@ const portfolioProjectSchema = new mongoose.Schema({
   description: { type: String, required: true, trim: true, maxlength: 2000 },
   location: { type: String, trim: true, default: '' },
   images: [{
-    url: { type: String, required: true },\n    mediaType: { type: String, enum: ['image', 'video'], default: 'image' },
+    url: { type: String, required: true },
+    mediaType: { type: String, enum: ['image', 'video'], default: 'image' },
     publicId: { type: String, default: '' },
     alt: { type: String, trim: true, default: '' },
   }],
