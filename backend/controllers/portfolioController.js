@@ -23,7 +23,7 @@ const createProject = asyncHandler(async (req, res) => {
   if (!title?.trim() || !category?.trim() || !description?.trim()) {
     return error(res, 400, 'Title, category and description are required');
   }
-  if (!Array.isArray(images) || images.length === 0 || images.some((image) => !image?.url)) {
+  if (!Array.isArray(images) || images.length === 0 || images.some((image) => !image?.url || !['image', 'video', undefined].includes(image?.mediaType))) {
     return error(res, 400, 'At least one project image is required');
   }
   const project = await PortfolioProject.create({ title, category, description, location, images, featured, published, sortOrder });
