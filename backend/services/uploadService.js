@@ -28,7 +28,7 @@ const buildUploader = (folder = 'cafe-menu') => {
     cloudinary,
     params: {
       folder,
-      allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm'],\n      resource_type: 'auto',
     },
   });
   return multer({ storage });
