@@ -3,11 +3,11 @@ import type { OrderStatus } from "@/lib/types";
 export const APP_NAME = "Lumora Curio";
 
 export const NAV_LINKS = [
-  { label: "Home", to: "/" },
-  { label: "Menu", to: "/menu" },
-  { label: "About", to: "/about" },
-  { label: "Contact", to: "/contact" },
-  { label: "Our Work", to: "/our-work" },
+  { label: 'Home', to: '/' },
+  { label: 'Explore', to: '/our-work' },
+  { label: 'About', to: '/about' },
+  { label: 'Contact', to: '/contact' },
+  { label: 'Our Work', to: '/our-work' },
 ] as const;
 
 export const ADMIN_LINKS = [
