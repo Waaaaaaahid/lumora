@@ -11,17 +11,12 @@ export const NAV_LINKS = [
 ] as const;
 
 export const ADMIN_LINKS = [
-  { label: "Dashboard", to: "/admin" },
-  { label: "Products", to: "/admin/menu" },
-  { label: "Categories", to: "/admin/categories" },
-  { label: "Our Work", to: "/admin/our-work" },
-  { label: "Orders", to: "/admin/orders" },
-  { label: "Coupons", to: "/admin/coupons" },
-  { label: "Reviews", to: "/admin/reviews" },
-  { label: "Users", to: "/admin/users" },
-  { label: "Payments", to: "/admin/payments" },
-  { label: "Store Settings", to: "/admin/settings" },
-] as const;
+  { label: 'Dashboard', to: '/admin' },
+  { label: 'Gallery Categories', to: '/admin/categories' },
+  { label: 'Our Work / Projects', to: '/admin/our-work' },
+  { label: 'Enquiries', to: '/admin/enquiries' },
+  { label: 'Website Settings', to: '/admin/settings' },
+] as const;;
 
 export const SORT_OPTIONS = [
   { value: "popular", label: "Most popular" },
