@@ -13,11 +13,11 @@ export const Route = createFileRoute("/our-work")({
 });
 
 function youtubeEmbed(url: string) {
-  const match = url.match(/(?:youtube\\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  const match = url.match(/(?:youtube\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return match ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 function youtubeThumbnail(url: string) {
-  const match = url.match(/(?:youtube\\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  const match = url.match(/(?:youtube\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
 }
 function OurWorkPage() {
@@ -48,7 +48,7 @@ function OurWorkPage() {
         projectsQuery.isError ? <div className="rounded-3xl border border-dashed border-[#d6d3ca] p-12 text-center text-sm text-[#77786f]">Our work couldn't load right now. Please try again shortly.</div> :
         visibleProjects.length ? <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
           {visibleProjects.map((project) => <button key={project._id} type="button" onClick={() => setActiveProject(project)} className="group overflow-hidden rounded-3xl bg-white text-left shadow-[0_12px_40px_rgba(35,35,28,.07)] transition hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(35,35,28,.12)]">
-            <div className="relative aspect-[1.32] overflow-hidden bg-[#e8e6e0]">{project.images[0]?.mediaType === "video" ? (youtubeThumbnail(project.images[0]?.url) ? <img src={youtubeThumbnail(project.images[0]?.url)!} alt={project.title} className="h-full w-full object-cover" /> : <video src={project.images[0]?.url} muted playsInline className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />) : <img src={project.images[0]?.url} alt={project.images[0]?.alt || project.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />}}<span className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#38382f]">{project.category}</span><span className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/90 text-[#34352e]"><ArrowUpRight className="size-4" /></span></div>
+            <div className="relative aspect-[1.32] overflow-hidden bg-[#e8e6e0]">{project.images[0]?.mediaType === "video" ? (youtubeThumbnail(project.images[0]?.url) ? <img src={youtubeThumbnail(project.images[0]?.url)!} alt={project.title} className="h-full w-full object-cover" /> : <video src={project.images[0]?.url} muted playsInline className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />) : <img src={project.images[0]?.url} alt={project.images[0]?.alt || project.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />}<span className="absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#38382f]">{project.category}</span><span className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/90 text-[#34352e]"><ArrowUpRight className="size-4" /></span></div>
             <div className="p-6 sm:p-7"><h3 className="font-serif text-2xl">{project.title}</h3>{project.location ? <p className="mt-2 flex items-center gap-1.5 text-xs text-[#85867e]"><MapPin className="size-3.5" />{project.location}</p> : null}<p className="mt-3 line-clamp-3 text-sm leading-6 text-[#77786f]">{project.description}</p><p className="mt-5 text-[10px] font-bold uppercase tracking-[.17em] text-[#8b765d]">View project <span aria-hidden>↗</span></p></div>
           </button>)}
         </div> : <div className="rounded-3xl border border-dashed border-[#d6d3ca] bg-white p-12 text-center"><Images className="mx-auto size-8 text-[#9b988e]" /><h3 className="mt-4 font-serif text-2xl">Projects coming soon</h3><p className="mt-2 text-sm text-[#77786f]">Our latest interior designs will appear here.</p></div>}
