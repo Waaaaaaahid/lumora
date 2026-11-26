@@ -34,7 +34,12 @@ export const adminService = {
   deleteUser: (id: string) => api.delete<{ _id: string }>(`/users/${id}`),
   updateSettings: (input: Partial<CafeSettings>) => api.put<CafeSettings>("/cafe/settings", input),
 
-  uploadPortfolioVideo: async (file: File) => {\n    const form = new FormData(); form.append("video", file); const token = getStoredSession()?.token;\n    const response = await fetch(`${API_BASE_URL}/portfolio/upload-video`, { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form });\n    const payload = await response.json().catch(() => null); if (!response.ok) throw new Error((payload as { message?: string } | null)?.message ?? "Video upload failed"); return (payload?.data ?? payload) as { url: string; publicId: string };\n  },\n  uploadPortfolioImage: async (file: File) => {
+  uploadPortfolioVideo: async (file: File) => {
+    const form = new FormData(); form.append("video", file); const token = getStoredSession()?.token;
+    const response = await fetch(`${API_BASE_URL}/portfolio/upload-video`, { method: "POST", headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form });
+    const payload = await response.json().catch(() => null); if (!response.ok) throw new Error((payload as { message?: string } | null)?.message ?? "Video upload failed"); return (payload?.data ?? payload) as { url: string; publicId: string };
+  },
+  uploadPortfolioImage: async (file: File) => {
     const form = new FormData();
     form.append("image", file);
     const token = getStoredSession()?.token;
