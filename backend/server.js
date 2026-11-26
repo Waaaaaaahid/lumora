@@ -26,6 +26,7 @@ const cafeRoutes = require('./routes/cafeRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const couponRoutes = require('./routes/couponRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
+const enquiryRoutes = require('./routes/enquiryRoutes');
 
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
@@ -83,6 +84,7 @@ app.use('/api/cafe', cafeRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/enquiries', enquiryRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
