@@ -1,0 +1,2 @@
+const express=require('express');const router=express.Router();const controller=require('../controllers/enquiryController');const {protect}=require('../middleware/authMiddleware');const {admin}=require('../middleware/adminMiddleware');
+router.post('/',controller.createEnquiry);router.get('/',protect,admin,controller.listEnquiries);router.patch('/:id',protect,admin,controller.updateEnquiry);module.exports=router;
