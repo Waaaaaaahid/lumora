@@ -16,7 +16,11 @@ router.post('/upload', protect, admin, (req, res, next) => {
   }
   return buildUploader('lumora/portfolio').single('image')(req, res, next);
 }, controller.uploadImage);
-router.post('/upload-video', protect, admin, (req, res, next) => {\n  if (!isCloudinaryConfigured()) return res.status(503).json({ success: false, message: 'Video storage is not configured. Add Cloudinary credentials to backend hosting.' });\n  return buildVideoUploader('lumora/portfolio/videos').single('video')(req, res, next);\n}, controller.uploadImage);\nrouter.post('/', protect, admin, controller.createProject);
+router.post('/upload-video', protect, admin, (req, res, next) => {
+  if (!isCloudinaryConfigured()) return res.status(503).json({ success: false, message: 'Video storage is not configured. Add Cloudinary credentials to backend hosting.' });
+  return buildVideoUploader('lumora/portfolio/videos').single('video')(req, res, next);
+}, controller.uploadImage);
+router.post('/', protect, admin, controller.createProject);
 router.put('/:id', protect, admin, controller.updateProject);
 router.delete('/:id', protect, admin, controller.deleteProject);
 
