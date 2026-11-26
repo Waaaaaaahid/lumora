@@ -17,7 +17,8 @@ export const ADMIN_LINKS = [
   { label: 'Website Settings', to: '/admin/settings' },
 ] as const;
 
-// Legacy catalog sort options kept for backward compatibility; not used in the design portfolio UI.\nexport const SORT_OPTIONS = [
+// Legacy catalog sort options kept for backward compatibility; not used in the design portfolio UI.
+export const SORT_OPTIONS = [
   { value: "popular", label: "Most popular" },
   { value: "price-asc", label: "Price: low to high" },
   { value: "price-desc", label: "Price: high to low" },
