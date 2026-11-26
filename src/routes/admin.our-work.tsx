@@ -21,7 +21,8 @@ function AdminOurWorkPage() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
-  const [uploading, setUploading] = useState(false);\n  const [videoUrl, setVideoUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const projectsQuery = useQuery({ queryKey: ["admin-portfolio"], queryFn: portfolioService.listAdmin });
   const projects = projectsQuery.data ?? [];
@@ -44,7 +45,9 @@ function AdminOurWorkPage() {
     } finally { setUploading(false); if (fileInput.current) fileInput.current.value = ""; }
   };
 
-  const addVideo = () => { const url = videoUrl.trim(); if (!url || !/^https?:\\/\\//i.test(url)) { notify("Enter a valid video URL (https://)", { variant: "error" }); return; } setForm(current => ({ ...current, images: [...current.images, { url, mediaType: "video" as const, alt: current.title || "Project video" }] })); setVideoUrl(""); };\n\n  const editProject = (project: PortfolioProject) => {
+  const addVideo = () => { const url = videoUrl.trim(); if (!url || !/^https?:\\/\\//i.test(url)) { notify("Enter a valid video URL (https://)", { variant: "error" }); return; } setForm(current => ({ ...current, images: [...current.images, { url, mediaType: "video" as const, alt: current.title || "Project video" }] })); setVideoUrl(""); };
+
+  const editProject = (project: PortfolioProject) => {
     setEditing(project._id);
     setForm({ title: project.title, category: project.category, description: project.description, location: project.location || "", images: project.images || [], featured: project.featured, published: project.published, sortOrder: project.sortOrder || 0 });
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -85,7 +88,8 @@ function AdminOurWorkPage() {
       <div className="mt-6 rounded-2xl border border-dashed border-border p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="text-sm font-semibold">Photos & videos</h3><p className="mt-1 text-xs text-muted-foreground">Upload photos (JPG/PNG/WebP, 5 MB max each) or add a hosted video URL.</p></div><Button type="button" variant="outline" disabled={uploading} onClick={() => fileInput.current?.click()}><ImagePlus className="mr-2 size-4" /> {uploading ? "Uploading..." : "Upload images"}</Button></div>
         <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => void uploadImages(e.target.files)} />
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row"><input value={videoUrl} onChange={e => setVideoUrl(e.target.value)} placeholder="Paste hosted video URL (MP4)" className="h-10 flex-1 rounded-xl border bg-background px-3 text-sm" /><Button type="button" variant="outline" onClick={addVideo}>Add video URL</Button></div>\n        {form.images.length ? <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">{form.images.map((image, index) => <div key={image.publicId || image.url} className="relative aspect-square overflow-hidden rounded-xl bg-muted">{image.mediaType === "video" ? <video src={image.url} controls className="h-full w-full object-cover" /> : <img src={image.url} alt={image.alt || form.title} className="h-full w-full object-cover" />}<button type="button" aria-label="Remove image" onClick={() => setForm({ ...form, images: form.images.filter((_, i) => i !== index) })} className="absolute right-2 top-2 rounded-full bg-black/70 p-2 text-white"><X className="size-3.5" /></button><span className="absolute bottom-2 left-2 rounded bg-black/65 px-2 py-1 text-[10px] text-white">{image.mediaType === "video" ? "Video" : `Image ${index + 1}`}</span></div>)}</div> : <div className="py-8 text-center text-xs text-muted-foreground"><Upload className="mx-auto mb-2 size-5" />No images uploaded yet</div>}
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row"><input value={videoUrl} onChange={e => setVideoUrl(e.target.value)} placeholder="Paste hosted video URL (MP4)" className="h-10 flex-1 rounded-xl border bg-background px-3 text-sm" /><Button type="button" variant="outline" onClick={addVideo}>Add video URL</Button></div>
+        {form.images.length ? <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">{form.images.map((image, index) => <div key={image.publicId || image.url} className="relative aspect-square overflow-hidden rounded-xl bg-muted">{image.mediaType === "video" ? <video src={image.url} controls className="h-full w-full object-cover" /> : <img src={image.url} alt={image.alt || form.title} className="h-full w-full object-cover" />}<button type="button" aria-label="Remove image" onClick={() => setForm({ ...form, images: form.images.filter((_, i) => i !== index) })} className="absolute right-2 top-2 rounded-full bg-black/70 p-2 text-white"><X className="size-3.5" /></button><span className="absolute bottom-2 left-2 rounded bg-black/65 px-2 py-1 text-[10px] text-white">{image.mediaType === "video" ? "Video" : `Image ${index + 1}`}</span></div>)}</div> : <div className="py-8 text-center text-xs text-muted-foreground"><Upload className="mx-auto mb-2 size-5" />No images uploaded yet</div>}
       </div>
       <div className="mt-5 flex flex-wrap gap-5 text-sm"><label className="flex items-center gap-2"><input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Featured project</label><label className="flex items-center gap-2"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> Visible on website</label></div>
       <div className="mt-6"><Button type="submit" size="lg" loading={saving || uploading} disabled={saving || uploading}><Plus className="mr-2 size-4" /> {editing ? "Save changes" : "Publish project"}</Button></div>
