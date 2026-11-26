@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, MessageCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { portfolioService } from "@/services/portfolioService";
 
 export const Route = createFileRoute("/")({
@@ -13,13 +14,37 @@ const categories = [
   { title: "Kitchens", subtitle: "Beautiful everyday function", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85" },
   { title: "Details & decor", subtitle: "Finishing touches", image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=900&q=85" },
 ];
+const heroImages = [
+  { url: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2560&q=90", alt: "Warm modern living room with soft neutral tones" },
+  { url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2560&q=90", alt: "Elegant contemporary interior with natural light" },
+  { url: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=2560&q=90", alt: "Relaxed bedroom interior with layered textures" },
+  { url: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=2560&q=90", alt: "Thoughtful interior details and decor" },
+];
+function HeroCarousel() {
+  const [active, setActive] = useState(0);
+  const touchStart = useRef<number | null>(null);
+  const move = (step: number) => setActive(index => (index + step + heroImages.length) % heroImages.length);
+  useEffect(() => {
+    const timer = window.setInterval(() => move(1), 5500);
+    return () => window.clearInterval(timer);
+  }, []);
+  return <div className="absolute inset-0" onTouchStart={e => { touchStart.current = e.touches[0]?.clientX ?? null; }} onTouchEnd={e => { if (touchStart.current === null) return; const delta = e.changedTouches[0].clientX - touchStart.current; if (Math.abs(delta) > 45) move(delta < 0 ? 1 : -1); touchStart.current = null; }}>
+    {heroImages.map((slide, index) => <img key={slide.url} src={slide.url} alt={slide.alt} fetchPriority={index === 0 ? "high" : "auto"} className={`absolute inset-0 size-full object-cover transition-opacity duration-1000 ${index === active ? "opacity-100" : "opacity-0"}`} />)}
+    <div className="absolute bottom-5 right-5 z-10 flex items-center gap-2 sm:bottom-8 sm:right-8">
+      <button type="button" aria-label="Previous slide" onClick={() => move(-1)} className="flex size-10 items-center justify-center rounded-full border border-white/60 bg-black/20 text-white backdrop-blur-sm"><ChevronLeft className="size-5"/></button>
+      {heroImages.map((slide, index) => <button key={slide.url} type="button" aria-label={`Show slide ${index + 1}`} onClick={() => setActive(index)} className={`h-1.5 rounded-full transition-all ${active === index ? "w-7 bg-white" : "w-2 bg-white/60"}`} />)}
+      <button type="button" aria-label="Next slide" onClick={() => move(1)} className="flex size-10 items-center justify-center rounded-full border border-white/60 bg-black/20 text-white backdrop-blur-sm"><ChevronRight className="size-5"/></button>
+    </div>
+  </div>;
+}
+
 function HomePage() {
   const q = useQuery({ queryKey: ["portfolio-projects"], queryFn: portfolioService.list, staleTime: 30000 });
   const projects = q.data || [];
   return <main className="bg-[#f5f4f1] text-[#242521]">
     <section className="relative min-h-[72vh] overflow-hidden bg-[#282923]">
-      <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2200&q=90" alt="Thoughtfully designed warm modern living room" className="absolute inset-0 size-full object-cover"/>
-      <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-black/10"/>
+      <HeroCarousel />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/25 to-black/10 pointer-events-none"/>
       <div className="relative mx-auto flex min-h-[72vh] max-w-[1440px] items-end px-6 pb-16 pt-28 sm:px-12 sm:pb-24 lg:px-16"><div className="max-w-2xl text-white"><p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#d8c3a9]">Spaces made personal</p><h1 className="mt-5 font-serif text-5xl leading-[1.04] tracking-tight sm:text-7xl">A home that feels<br/><span className="italic text-[#e2cdb5]">like you.</span></h1><p className="mt-5 max-w-lg text-sm leading-6 text-white/80 sm:text-base">Thoughtful interiors, timeless textures and beautiful details. Explore ideas and discover spaces designed for real life.</p><Link to="/our-work" className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#272822]">Explore our work <ArrowUpRight className="size-4"/></Link></div></div>
     </section>
     <section className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 sm:py-20 lg:px-14"><div className="mb-8 text-center"><p className="text-[10px] font-bold uppercase tracking-[.22em] text-[#8a765d]">Browse inspiration</p><h2 className="mt-3 font-serif text-3xl sm:text-5xl">Explore by space</h2></div><div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">{categories.map(c=><Link key={c.title} to="/our-work" className="group relative aspect-[.82] overflow-hidden rounded-2xl sm:rounded-3xl"><img src={c.image} alt={c.title} loading="lazy" className="size-full object-cover transition duration-700 group-hover:scale-105"/><div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"/><div className="absolute bottom-4 left-4 right-4 text-white sm:bottom-6 sm:left-6"><h3 className="font-serif text-xl sm:text-2xl">{c.title}</h3><p className="mt-1 text-[10px] text-white/70 sm:text-xs">{c.subtitle}</p></div></Link>)}</div></section>
