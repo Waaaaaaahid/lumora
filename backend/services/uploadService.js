@@ -56,4 +56,4 @@ const buildVideoUploader = (folder = 'lumora/portfolio/videos') => {
   return multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 };
 
-module.exports = { buildUploader, buildVideoUploader, isCloudinaryConfigured, deleteCloudinaryImage };
+const deleteCloudinaryMedia = async (publicId, mediaType = 'image') => {\n  if (!isCloudinaryConfigured() || !publicId) return;\n  try { configureCloudinary(); await cloudinary.uploader.destroy(String(publicId), { resource_type: mediaType === 'video' ? 'video' : 'image' }); }\n  catch (error) { console.warn('Cloudinary media delete skipped:', error.message); }\n};\n\nmodule.exports = { buildUploader, buildVideoUploader, isCloudinaryConfigured, deleteCloudinaryImage, deleteCloudinaryMedia };
