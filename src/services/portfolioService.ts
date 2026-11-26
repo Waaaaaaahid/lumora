@@ -2,7 +2,7 @@ import { api } from "@/services/api";
 
 export interface PortfolioImage {
   url: string;
-  publicId?: string;
+  publicId?: string;\n  mediaType?: 'image' | 'video';
   alt?: string;
 }
 
