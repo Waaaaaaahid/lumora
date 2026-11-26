@@ -13,9 +13,11 @@ export const Route = createFileRoute("/our-work")({
 });
 
 function OurWorkPage() {
-  const [activeProject, setActiveProject] = useState<PortfolioProject | null>(null);\n  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeProject, setActiveProject] = useState<PortfolioProject | null>(null);
+  const [activeCategory, setActiveCategory] = useState("All");
   const projectsQuery = useQuery({ queryKey: ["portfolio-projects"], queryFn: portfolioService.list, staleTime: 30_000 });
-  const projects = projectsQuery.data ?? [];\n  const categories = ["All", ...Array.from(new Set(projects.map(p => p.category).filter(Boolean)))];
+  const projects = projectsQuery.data ?? [];
+  const categories = ["All", ...Array.from(new Set(projects.map(p => p.category).filter(Boolean)))];
 
   return (
     <div className="min-h-screen bg-[#f5f4f1] text-[#242521]">
@@ -31,7 +33,8 @@ function OurWorkPage() {
           <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#8b765d]">Selected projects</p><h2 className="mt-2 font-serif text-3xl sm:text-4xl">Designed with intention</h2></div>
           <span className="text-xs text-[#85867e]">{projects.length} {projects.length === 1 ? "project" : "projects"}</span>
         </div>
-        <div className="mb-6 flex flex-wrap gap-2">{categories.map(category => <button key={category} type="button" onClick={() => setActiveCategory(category)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${activeCategory===category ? "border-[#292a25] bg-[#292a25] text-white" : "border-[#d6d3ca] bg-white text-[#55564f] hover:bg-[#eae8e2]"}`}>{category}</button>)}</div>\n        {projectsQuery.isLoading ? <div className="grid gap-7 md:grid-cols-2">{[1,2,3,4].map((n) => <div key={n} className="h-[420px] animate-pulse rounded-3xl bg-[#e8e6e0]" />)}</div> :
+        <div className="mb-6 flex flex-wrap gap-2">{categories.map(category => <button key={category} type="button" onClick={() => setActiveCategory(category)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${activeCategory===category ? "border-[#292a25] bg-[#292a25] text-white" : "border-[#d6d3ca] bg-white text-[#55564f] hover:bg-[#eae8e2]"}`}>{category}</button>)}</div>
+        {projectsQuery.isLoading ? <div className="grid gap-7 md:grid-cols-2">{[1,2,3,4].map((n) => <div key={n} className="h-[420px] animate-pulse rounded-3xl bg-[#e8e6e0]" />)}</div> :
         projectsQuery.isError ? <div className="rounded-3xl border border-dashed border-[#d6d3ca] p-12 text-center text-sm text-[#77786f]">Our work couldn't load right now. Please try again shortly.</div> :
         projects.length ? <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
           {projects.filter(project => activeCategory === "All" || project.category === activeCategory).map((project) => <button key={project._id} type="button" onClick={() => setActiveProject(project)} className="group overflow-hidden rounded-3xl bg-white text-left shadow-[0_12px_40px_rgba(35,35,28,.07)] transition hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(35,35,28,.12)]">
