@@ -12,7 +12,6 @@ export const NAV_LINKS = [
 
 export const ADMIN_LINKS = [
   { label: 'Dashboard', to: '/admin' },
-  { label: 'Gallery Categories', to: '/admin/categories' },
   { label: 'Our Work / Projects', to: '/admin/our-work' },
   { label: 'Enquiries', to: '/admin/enquiries' },
   { label: 'Website Settings', to: '/admin/settings' },
