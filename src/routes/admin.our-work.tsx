@@ -23,13 +23,14 @@ function AdminOurWorkPage() {
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const projectsQuery = useQuery({ queryKey: ["admin-portfolio"], queryFn: portfolioService.listAdmin });
   const categoriesQuery = useQuery({ queryKey: ["gallery-categories"], queryFn: adminService.listCategories });
   const galleryCategories = (categoriesQuery.data || []).filter(category => category.active).map(category => category.name);
   const projects = projectsQuery.data ?? [];
 
-  const youtubeEmbed = (url: string) => { const match = url.match(/(?:youtube\.com\\/(?:watch\\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return match ? `https://www.youtube.com/embed/${match[1]}` : null; };
+  const youtubeEmbed = (url: string) => { const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return match ? `https://www.youtube.com/embed/${match[1]}` : null; };
   const reset = () => { setEditing(null); setForm(emptyForm); if (fileInput.current) fileInput.current.value = ""; };
   const uploadImages = async (files: FileList | null) => {
     if (!files?.length) return;
@@ -49,6 +50,7 @@ function AdminOurWorkPage() {
   };
 
   const addVideo = () => { const url = videoUrl.trim(); if (!url || !/^https?:\/\//i.test(url)) { notify("Enter a valid video URL (https://)", { variant: "error" }); return; } setForm(current => ({ ...current, images: [...current.images, { url, mediaType: "video" as const, alt: current.title || "Project video" }] })); setVideoUrl(""); };
+  const addPhotoUrl = () => { const url = photoUrl.trim(); if (!url || !/^https?:\/\//i.test(url)) { notify("Enter a valid image URL (https://)", { variant: "error" }); return; } setForm(current => ({ ...current, images: [...current.images, { url, mediaType: "image" as const, alt: current.title || "Project photo" }] })); setPhotoUrl(""); };
 
   const editProject = (project: PortfolioProject) => {
     setEditing(project._id);
@@ -91,6 +93,7 @@ function AdminOurWorkPage() {
       <div className="mt-6 rounded-2xl border border-dashed border-border p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="text-sm font-semibold">Photos & videos</h3><p className="mt-1 text-xs text-muted-foreground">Upload photos (JPG/PNG/WebP, max 5 MB) or MP4/WebM videos (max 50 MB). You can also paste a YouTube link or direct video URL.</p></div><Button type="button" variant="outline" disabled={uploading} onClick={() => fileInput.current?.click()}><ImagePlus className="mr-2 size-4" /> {uploading ? "Uploading media..." : "Upload photos/videos"}</Button></div>
         <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple className="hidden" onChange={(e) => void uploadImages(e.target.files)} />
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row"><input value={photoUrl} onChange={e => setPhotoUrl(e.target.value)} placeholder="Paste direct photo URL (https://...)" className="h-10 flex-1 rounded-xl border bg-background px-3 text-sm" /><Button type="button" variant="outline" onClick={addPhotoUrl}>Add photo URL</Button></div>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row"><input value={videoUrl} onChange={e => setVideoUrl(e.target.value)} placeholder="Paste YouTube link or direct video URL" className="h-10 flex-1 rounded-xl border bg-background px-3 text-sm" /><Button type="button" variant="outline" onClick={addVideo}>Add video link</Button></div>
         {form.images.length ? <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">{form.images.map((image, index) => <div key={image.publicId || image.url} className="relative aspect-square overflow-hidden rounded-xl bg-muted">{image.mediaType === "video" ? (youtubeEmbed(image.url) ? <iframe src={youtubeEmbed(image.url)!} title="Video preview" className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /> : <video src={image.url} controls className="h-full w-full object-cover" />) : <img src={image.url} alt={image.alt || form.title} className="h-full w-full object-cover" />}<button type="button" aria-label="Remove image" onClick={() => setForm({ ...form, images: form.images.filter((_, i) => i !== index) })} className="absolute right-2 top-2 rounded-full bg-black/70 p-2 text-white"><X className="size-3.5" /></button><span className="absolute bottom-2 left-2 rounded bg-black/65 px-2 py-1 text-[10px] text-white">{image.mediaType === "video" ? "Video" : `Image ${index + 1}`}</span></div>)}</div> : <div className="py-8 text-center text-xs text-muted-foreground"><Upload className="mx-auto mb-2 size-5" />No media uploaded yet</div>}
       </div>
