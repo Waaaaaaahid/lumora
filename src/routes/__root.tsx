@@ -10,19 +10,17 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageCircle, X, ShoppingBag, Headset, ArrowUpRight } from "lucide-react";
+import { MessageCircle, X, BriefcaseBusiness, Headset, ArrowUpRight } from "lucide-react";
 import { useCafe } from "@/context/CafeContext";
 
 import appCss from "../styles.css?url";
 import { CafeProvider } from "@/context/CafeContext";
 import { AuthProvider } from "@/context/AuthContext";
-import { CartProvider } from "@/context/CartContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { ToastViewport } from "@/components/Toast/ToastViewport";
 import { AdminLiveUpdates } from "@/components/AdminLiveUpdates/AdminLiveUpdates";
 import { Navbar } from "@/components/Navbar/Navbar";
 import { Footer } from "@/components/Footer/Footer";
-import { CartDrawer } from "@/components/CartDrawer/CartDrawer";
 
 function NotFoundComponent() {
   return (
@@ -60,8 +58,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Online Store" },
-      { name: "description", content: "Discover thoughtfully selected products for everyday living." },
+      { title: "Lumora Curio | Interior Design Studio" },
+      { name: "description", content: "Thoughtful interiors, timeless textures and spaces designed around you. Explore Lumora Curio interior projects and enquire about your space." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -123,16 +121,16 @@ function WhatsAppEnquiry() {
 
   const openChat = (number: string, category: "sales" | "support") => {
     const message = category === "sales"
-      ? "Hi Lumora Curio, I have a question about your products and would like to know more."
-      : "Hi Lumora Curio, I need some assistance. Could you please help me?";
+      ? "Hi Lumora Curio, I would like to enquire about an interior design project."
+      : "Hi Lumora Curio, I would like to discuss a design consultation for my space.";
     window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
     setActiveMenu(null);
     setOpen(false);
   };
 
   const groups = [
-    { id: "sales" as const, title: "Sales & Enquiries", Icon: ShoppingBag },
-    { id: "support" as const, title: "Customer Support", Icon: Headset },
+    { id: "sales" as const, title: "Project Enquiries", Icon: BriefcaseBusiness },
+    { id: "support" as const, title: "Design Consultation", Icon: Headset },
   ];
 
   return (
@@ -232,14 +230,13 @@ function WhatsAppEnquiry() {
 function SiteChrome() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isAdmin = pathname.startsWith("/admin");
-  const isAuth = ["/login", "/register", "/forgot-password", "/reset-password"].includes(pathname);
+  const isAuth = ["/login", "/forgot-password", "/reset-password"].includes(pathname);
   return (
     <div className="flex min-h-screen flex-col">
       {isAdmin || isAuth ? null : <Navbar />}
       <main className="flex-1"><Outlet /></main>
       {isAdmin || isAuth ? null : <Footer />}
       {isAdmin || isAuth ? null : <WhatsAppEnquiry />}
-      <CartDrawer />
       <ToastViewport />
     </div>
   );
@@ -252,10 +249,8 @@ function RootComponent() {
       <ToastProvider>
         <CafeProvider>
           <AuthProvider>
-            <CartProvider>
-              <AdminLiveUpdates />
-              <SiteChrome />
-            </CartProvider>
+            <AdminLiveUpdates />
+            <SiteChrome />
           </AuthProvider>
         </CafeProvider>
       </ToastProvider>
