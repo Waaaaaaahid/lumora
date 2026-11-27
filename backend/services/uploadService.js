@@ -1,6 +1,5 @@
 // backend/services/uploadService.js
-// Multer + Cloudinary storage for menu images. Enabled only when the
-// CLOUDINARY_* env vars are configured in the hosting environment.
+// Multer + Cloudinary storage for portfolio images and videos.
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { cloudinary, configureCloudinary } = require('../config/cloudinary');
@@ -12,11 +11,7 @@ const isCloudinaryConfigured = () =>
       process.env.CLOUDINARY_API_SECRET,
   );
 
-/**
- * Builds a multer storage engine backed by Cloudinary.
- * Throws a descriptive error when Cloudinary is not configured.
- */
-const buildUploader = (folder = 'cafe-menu') => {
+const buildUploader = (folder = 'lumora/portfolio') => {
   if (!isCloudinaryConfigured()) {
     throw new Error(
       'Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET.',
@@ -28,32 +23,45 @@ const buildUploader = (folder = 'cafe-menu') => {
     cloudinary,
     params: {
       folder,
-      allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm'],
-      resource_type: 'auto',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+      resource_type: 'image',
     },
   });
   return multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 };
 
-/**
- * Best-effort removal of a Cloudinary asset by its publicId.
- * No-ops when Cloudinary is not configured or the id is missing.
- */
-const deleteCloudinaryImage = async (publicId) => {
-  if (!isCloudinaryConfigured() || !publicId) return;
-  try {
-    configureCloudinary();
-    await cloudinary.uploader.destroy(String(publicId));
-  } catch (error) {
-    console.warn('Cloudinary delete skipped:', error.message);
-  }
-};
-
 const buildVideoUploader = (folder = 'lumora/portfolio/videos') => {
   if (!isCloudinaryConfigured()) throw new Error('Cloudinary is not configured.');
   configureCloudinary();
-  const storage = new CloudinaryStorage({ cloudinary, params: { folder, resource_type: 'video', allowed_formats: ['mp4', 'webm'] } });
+  const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder,
+      resource_type: 'video',
+      allowed_formats: ['mp4', 'webm'],
+    },
+  });
   return multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 };
 
-const deleteCloudinaryMedia = async (publicId, mediaType = 'image') => {\n  if (!isCloudinaryConfigured() || !publicId) return;\n  try { configureCloudinary(); await cloudinary.uploader.destroy(String(publicId), { resource_type: mediaType === 'video' ? 'video' : 'image' }); }\n  catch (error) { console.warn('Cloudinary media delete skipped:', error.message); }\n};\n\nmodule.exports = { buildUploader, buildVideoUploader, isCloudinaryConfigured, deleteCloudinaryImage, deleteCloudinaryMedia };
+const deleteCloudinaryMedia = async (publicId, mediaType = 'image') => {
+  if (!isCloudinaryConfigured() || !publicId) return;
+  try {
+    configureCloudinary();
+    await cloudinary.uploader.destroy(String(publicId), {
+      resource_type: mediaType === 'video' ? 'video' : 'image',
+    });
+  } catch (error) {
+    console.warn('Cloudinary media delete skipped:', error.message);
+  }
+};
+
+const deleteCloudinaryImage = (publicId) => deleteCloudinaryMedia(publicId, 'image');
+
+module.exports = {
+  buildUploader,
+  buildVideoUploader,
+  isCloudinaryConfigured,
+  deleteCloudinaryImage,
+  deleteCloudinaryMedia,
+};
