@@ -16,7 +16,7 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   useEffect(() => setMobileOpen(false), [pathname]);
-  const links = [{ label: "Home", to: "/" }, { label: "Explore", to: "/our-work" }, { label: "Our Work", to: "/our-work" }, { label: "About", to: "/about" }, { label: "Contact", to: "/contact" }];
+  const links = [{ label: "Home", to: "/" }, { label: "Our Work", to: "/our-work" }, { label: "About", to: "/about" }, { label: "Contact", to: "/contact" }];
   return <header className={"sticky top-0 z-50 border-b border-[#e9e8e1] bg-[#fbfaf7]/95 backdrop-blur-xl transition-all " + (scrolled ? "shadow-[0_8px_28px_rgba(30,32,26,.06)]" : "")}>
     <AnnouncementBar />
     <nav className="relative mx-auto flex h-[70px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-14">
